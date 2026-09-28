@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org" th:fragment="page(title, content)">
+<head th:replace="~{fragments/head :: head(${title})}"></head>
+<body>
+<a class="skip-link" href="#main-content">رفتن به محتوای اصلی</a>
+<header th:replace="~{fragments/header :: header}"></header>
+<main id="main-content" class="container page-content" tabindex="-1">
+    <div th:replace="~{fragments/messages :: messages}"></div>
+    <th:block th:replace="${content}"></th:block>
+</main>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script th:src="@{/vendor/bootstrap/bootstrap.min.js}" defer></script>
+</body>
+</html>

@@ -77,8 +77,15 @@ class ApplicationSmokeTest {
         assertThat(response.headers().firstValue("content-type")).hasValueSatisfying(
                 value -> assertThat(value).contains("text/html", "charset=UTF-8"));
         assertThat(response.body())
-                .contains("lang=\"fa\"", "dir=\"rtl\"", "<h1>نقطه رنگی</h1>", "href=\"/\"")
-                .doesNotContain("th:href");
+                .contains("lang=\"fa\"", "dir=\"rtl\"", "id=\"hero-title\"", "نقطه رنگی", "href=\"/\"")
+                .contains("/vendor/bootstrap/bootstrap.rtl.min.css", "/css/main.css",
+                        "id=\"main-navigation\"", "id=\"main-content\"", "<footer")
+                .doesNotContain("th:href", "th:replace", "th:fragment");
+
+        for (String asset : new String[]{"/css/main.css",
+                "/vendor/bootstrap/bootstrap.rtl.min.css", "/vendor/bootstrap/bootstrap.min.js"}) {
+            assertThat(get(asset).statusCode()).as(asset).isEqualTo(200);
+        }
     }
 
     private HttpResponse<String> get(String path) throws Exception {

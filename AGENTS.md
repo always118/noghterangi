@@ -1,17 +1,24 @@
 # Noghte Rangi Project Instructions
 
-- Use Java 21 + Spring Boot.
-- Use Thymeleaf + Bootstrap 5.
-- Use PostgreSQL + Flyway.
-- Keep code simple, readable, and easy to modify.
+- Use Java 21.
+- Use Spring Boot.
+- Use Spring MVC + Thymeleaf.
+- Use Bootstrap 5 RTL for UI.
+- Use PostgreSQL + Spring Data JPA + Flyway.
+- Keep the architecture a simple modular monolith.
 - Use package-by-feature.
+- Keep code simple, readable, and easy to modify.
 - Avoid unnecessary abstractions and dependencies.
-- Do not use React, microservices, Redis, Kafka, or Elasticsearch.
+- Do not use React, Redux, microservices, Redis, Kafka, Elasticsearch, or GraphQL.
 - Inspect only files relevant to the current task.
 - Do not scan the entire repository unless necessary.
-- Ignore target, generated files, IDE files, logs, and binaries.
-- Run relevant tests after changes.
+- Ignore target, generated files, IDE files, logs, uploads, and binaries.
+- Run relevant tests after every change.
 - Fix errors before continuing.
 - Work on one development phase at a time.
-- Do not continue to the next phase without my approval.
+- Do not start the next phase without explicit approval.
 - Keep explanations concise.
+- Before each phase read PROJECT_STATUS.md and PHASE_STATUS.md.
+- At the start of each phase update its status to IN_PROGRESS.
+- Mark a phase DONE only after build/tests/verification succeed.
+- Do not commit Git changes automatically unless explicitly requested.

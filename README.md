@@ -1,7 +1,7 @@
 # Noghte Rangi — نقطه رنگی
 
 A Persian local online shop built incrementally as a simple Spring Boot modular
-monolith. Current implementation: **Phase 2 — PostgreSQL and Flyway**.
+monolith. Current implementation: **Phase 3 — Base UI and RTL**.
 
 ## Prerequisites
 
@@ -11,6 +11,13 @@ monolith. Current implementation: **Phase 2 — PostgreSQL and Flyway**.
 - For WSL: enable Docker Desktop integration for this distribution
 
 Check `java -version`, `mvn -version`, and `docker compose version`.
+If Maven still reports Java 11 on WSL, set the installed JDK for your shell:
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH="$JAVA_HOME/bin:$PATH"
+mvn -version
+```
 Spring Boot 4.1.1 manages dependency versions. The application uses MVC,
 Thymeleaf, Validation, JPA, the PostgreSQL JDBC driver, and Flyway (including
 its PostgreSQL module). There is no frontend build pipeline.
@@ -158,3 +165,28 @@ Java code lives under `com.noghterangi`. No admin, product, category, cart, or
 order functionality is implemented. Phase 3 will add Bootstrap 5, reusable
 Thymeleaf fragments, Persian typography, RTL layout, and a small design system.
 Development stops after each phase for explicit approval.
+
+## UI foundation (Phase 3)
+
+`templates/fragments/layout.html` is the shared Persian (`lang="fa"`, `dir="rtl"`)
+page shell. New templates can reuse it with:
+
+```html
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('عنوان صفحه', ~{::content})}">
+<body><section th:fragment="content">محتوای صفحه</section></body>
+</html>
+```
+
+The shell includes head, header/navigation, optional `successMessage` and
+`errorMessage` alerts, and footer fragments. Messages use escaped text.
+Design variables and decorative CSS illustrations live in `static/css/main.css`.
+Bootstrap 5.3.8 RTL CSS and JavaScript are served locally under `static/vendor/bootstrap`
+with the upstream license; no CDN connection is needed at runtime.
+The homepage contains demo content only; search is disabled and no shopping
+or category routes, entities, or migrations are added.
+
+For browser verification, open `/` at 360px, 768px, and 1440px widths. Check
+Persian text, RTL order, card wrapping, and absence of horizontal scrolling.
+On mobile, open and close the navigation with mouse and keyboard. Tab from the
+address bar to test the skip link and visible focus. Check `/health` returns `OK`.

@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="header" class="site-header">
+    <div class="announcement text-center px-3 py-2">برای روزهای پر از رنگ، فکر و خیال</div>
+    <div class="container">
+        <nav th:replace="~{fragments/navigation :: navigation}"></nav>
+    </div>
+</header>
+</body>
+</html>

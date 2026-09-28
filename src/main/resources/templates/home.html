@@ -1,17 +1,84 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="نقطه رنگی؛ فروشگاه لوازم‌تحریر، کتاب و بازی‌های فکری">
-    <title>نقطه رنگی</title>
-</head>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('خانه', ~{::content})}">
+<head><title>نقطه رنگی</title></head>
 <body>
-<main>
-    <h1>نقطه رنگی</h1>
-    <p>به نقطه رنگی خوش آمدید.</p>
-    <p>فروشگاه لوازم‌تحریر، کتاب و بازی‌های فکری به‌زودی آماده می‌شود.</p>
-    <a th:href="@{/}">خانه</a>
-</main>
+<th:block th:fragment="content">
+    <section class="hero mb-5" aria-labelledby="hero-title">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-7">
+                <p class="eyebrow">به دنیای نقطه رنگی خوش آمدید</p>
+                <h1 id="hero-title">اینجا، هر روز<br><span>رنگ تازه‌ای دارد.</span></h1>
+                <p class="hero-description mt-3 mb-4">از اولین خط یک دفتر تا هیجان یک بازی دورهمی؛ برای لحظه‌های کوچک و دوست‌داشتنی کنار هم هستیم.</p>
+                <a class="btn btn-primary" href="#categories">کشف دنیای رنگی ما <span aria-hidden="true">←</span></a>
+                <p class="small text-muted mt-3 mb-0">یک نگاه به فروشگاهی که در راه است</p>
+            </div>
+            <div class="col-lg-5">
+                <div class="hero-art" aria-hidden="true">
+                    <span class="art-caption">بنویس. بازی کن. خیال بساز.</span>
+                    <div class="notebook"><span>ایده‌های<br>رنگی من</span></div>
+                    <div class="pencil"></div>
+                    <div class="game-tile">✦</div>
+                    <span class="art-dot"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="search-demo mb-5" aria-labelledby="search-title">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <h2 id="search-title" class="h5">دنبال چه رنگی از شادی می‌گردی؟</h2>
+                <p id="search-help" class="small text-muted mb-0">جست‌وجو در نسخه‌های بعدی فعال می‌شود.</p>
+            </div>
+            <div class="col-md-7">
+                <label class="visually-hidden" for="demo-search">جست‌وجو در فروشگاه (به‌زودی)</label>
+                <div class="d-flex gap-2">
+                    <input id="demo-search" class="form-control" type="search" placeholder="دفتر، مدادرنگی، بازی..." aria-describedby="search-help" disabled>
+                    <button class="btn btn-primary flex-shrink-0" type="button" disabled>جست‌وجو</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="categories" class="mb-5" aria-labelledby="categories-title">
+        <p class="eyebrow">برای هر سلیقه، یک دنیای کوچک</p>
+        <h2 id="categories-title" class="section-title">دنیای رنگی ما</h2>
+        <p class="text-muted">دسته‌بندی‌های نمایشی؛ به‌زودی با انتخاب‌های واقعی.</p>
+        <div class="row g-3">
+            <div class="col-12 col-sm-6 col-lg-3"><article class="category-card tone-mint"><span class="category-symbol" aria-hidden="true">✎</span><h3 class="h5">لوازم‌تحریر</h3><p class="mb-0">برای نوشتن رویاهای بزرگ</p></article></div>
+            <div class="col-12 col-sm-6 col-lg-3"><article class="category-card tone-peach"><span class="category-symbol" aria-hidden="true">✿</span><h3 class="h5">نقاشی و خلاقیت</h3><p class="mb-0">رنگ‌ها را به خیال بسپار</p></article></div>
+            <div class="col-12 col-sm-6 col-lg-3"><article class="category-card tone-lilac"><span class="category-symbol" aria-hidden="true">⚄</span><h3 class="h5">بازی‌های فکری</h3><p class="mb-0">یک دور دیگر، کنار هم</p></article></div>
+            <div class="col-12 col-sm-6 col-lg-3"><article class="category-card tone-sand"><span class="category-symbol" aria-hidden="true">▤</span><h3 class="h5">کتاب و قصه</h3><p class="mb-0">سفر به دنیاهای نادیده</p></article></div>
+        </div>
+    </section>
+
+    <section id="inspiration" class="mb-5" aria-labelledby="inspiration-title">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <h2 id="inspiration-title" class="section-title mb-0">چند ایده برای روزهای رنگی</h2>
+            <span class="demo-badge">نمونه‌های نمایشی</span>
+        </div>
+        <div class="row g-4">
+            <div class="col-12 col-sm-6 col-lg-4">
+                <article class="card product-card h-100">
+                    <div class="product-art tone-mint" aria-hidden="true"><div class="mini-notebook">دفتر خیال</div></div>
+                    <div class="card-body"><p class="small text-muted">نوشتن و خیال‌پردازی</p><h3 class="h5">دفتر ایده‌های تازه</h3><p>جایی برای فکرهای کوچک و رویاهای بزرگ.</p><span class="availability">به‌زودی</span></div>
+                </article>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <article class="card product-card h-100">
+                    <div class="product-art tone-peach" aria-hidden="true"><div class="color-pencils"><i></i><i></i><i></i><i></i><i></i></div></div>
+                    <div class="card-body"><p class="small text-muted">نقاشی و خلاقیت</p><h3 class="h5">یک جعبه رنگ و خیال</h3><p>برای وقتی که حرف‌ها، رنگ می‌شوند.</p><span class="availability">به‌زودی</span></div>
+                </article>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-4">
+                <article class="card product-card h-100">
+                    <div class="product-art tone-lilac" aria-hidden="true"><div class="demo-dice">⚄</div></div>
+                    <div class="card-body"><p class="small text-muted">بازی و دورهمی</p><h3 class="h5">بهانه‌ای برای باهم بودن</h3><p>لحظه‌های پر از فکر، خنده و رقابت دوستانه.</p><span class="availability">به‌زودی</span></div>
+                </article>
+            </div>
+        </div>
+    </section>
+</th:block>
 </body>
 </html>
