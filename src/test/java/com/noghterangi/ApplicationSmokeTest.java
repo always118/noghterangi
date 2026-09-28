@@ -12,6 +12,8 @@ import javax.sql.DataSource;
 import jakarta.persistence.EntityManagerFactory;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
+import com.noghterangi.admin.AdminTestConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@Import(AdminTestConfiguration.class)
 class ApplicationSmokeTest {
 
     @LocalServerPort
@@ -54,7 +57,7 @@ class ApplicationSmokeTest {
         flyway.validate();
         assertThat(flyway.info().applied())
                 .extracting(migration -> migration.getScript())
-                .contains("V1__create_application_schema.sql");
+                .contains("V1__create_application_schema.sql", "V2__create_category.sql");
         assertThat(flyway.info().pending()).isEmpty();
         assertThat(flyway.migrate().migrationsExecuted).isZero();
     }

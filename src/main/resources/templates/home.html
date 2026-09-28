@@ -44,12 +44,16 @@
     <section id="categories" class="mb-5" aria-labelledby="categories-title">
         <p class="eyebrow">برای هر سلیقه، یک دنیای کوچک</p>
         <h2 id="categories-title" class="section-title">دنیای رنگی ما</h2>
-        <p class="text-muted">دسته‌بندی‌های نمایشی؛ به‌زودی با انتخاب‌های واقعی.</p>
+        <p th:if="${#lists.isEmpty(activeCategories)}" class="text-muted">دسته‌بندی‌ها به‌زودی اضافه می‌شوند.</p>
         <div class="row g-3">
-            <div class="col-12 col-sm-6 col-lg-3"><article class="category-card tone-mint"><span class="category-symbol" aria-hidden="true">✎</span><h3 class="h5">لوازم‌تحریر</h3><p class="mb-0">برای نوشتن رویاهای بزرگ</p></article></div>
-            <div class="col-12 col-sm-6 col-lg-3"><article class="category-card tone-peach"><span class="category-symbol" aria-hidden="true">✿</span><h3 class="h5">نقاشی و خلاقیت</h3><p class="mb-0">رنگ‌ها را به خیال بسپار</p></article></div>
-            <div class="col-12 col-sm-6 col-lg-3"><article class="category-card tone-lilac"><span class="category-symbol" aria-hidden="true">⚄</span><h3 class="h5">بازی‌های فکری</h3><p class="mb-0">یک دور دیگر، کنار هم</p></article></div>
-            <div class="col-12 col-sm-6 col-lg-3"><article class="category-card tone-sand"><span class="category-symbol" aria-hidden="true">▤</span><h3 class="h5">کتاب و قصه</h3><p class="mb-0">سفر به دنیاهای نادیده</p></article></div>
+            <div class="col-12 col-sm-6 col-lg-3" th:each="category, item : ${activeCategories}">
+                <article class="category-card text-break" th:id="'category-' + ${category.slug}"
+                         th:classappend="${ {'tone-mint', 'tone-peach', 'tone-lilac', 'tone-sand'}[item.index % 4]}">
+                    <span class="category-symbol" aria-hidden="true">✦</span>
+                    <h3 class="h5" th:text="${category.name}"></h3>
+                    <p class="mb-0" th:if="${!#strings.isEmpty(category.description)}" th:text="${category.description}"></p>
+                </article>
+            </div>
         </div>
     </section>
 

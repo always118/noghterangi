@@ -45,7 +45,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .form-control:disabled { background: #f3f5f2; opacity: 1; }
 .form-control::placeholder { color: var(--nr-muted); }
 .section-title { font-size: clamp(1.35rem, 3vw, 1.8rem); }
-.category-card { height: 100%; padding: var(--nr-space); border-radius: var(--nr-radius); }
+.category-card { overflow-wrap: anywhere; height: 100%; padding: var(--nr-space); border-radius: var(--nr-radius); }
 .category-card p { font-size: .875rem; }
 .category-symbol { display: block; font-size: 2rem; margin-bottom: .5rem; }
 .tone-mint { background: #e2eee5; }

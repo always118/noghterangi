@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org">
+<body><nav th:fragment="navigation" class="d-flex flex-wrap align-items-center gap-3 mb-4" aria-label="منوی مدیریت">
+    <a th:href="@{/admin}">خانه مدیریت</a>
+    <a th:href="@{/admin/categories}">دسته‌بندی‌ها</a>
+    <form class="ms-auto" method="post" th:action="@{/admin/logout}">
+        <button class="btn btn-outline-secondary" type="submit">خروج از مدیریت</button>
+    </form>
+</nav></body>
+</html>

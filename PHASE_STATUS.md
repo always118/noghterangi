@@ -5,19 +5,19 @@
 | 0 | Repository Inspection | DONE | Empty repository inspected |
 | 1 | Spring Boot Foundation | DONE | Build + tests + / + /health passed |
 | 2 | PostgreSQL and Flyway | DONE | DB + JPA + Flyway + tests passed |
-| 3 | Base UI and RTL | DONE | RTL + Bootstrap + fragments; Chromium 360/768/1440px; mvn clean verify (4 tests); / and /health HTTP 200 |
-| 4 | Categories | NOT_STARTED | — |
-| 5 | Products | NOT_STARTED | — |
-| 6 | Product Images | NOT_STARTED | — |
-| 7 | Product Catalog | NOT_STARTED | — |
-| 8 | Product Detail | NOT_STARTED | — |
-| 9 | Shopping Cart | NOT_STARTED | — |
-| 10 | Checkout and Orders | NOT_STARTED | — |
-| 11 | Admin Security | NOT_STARTED | — |
+| 3 | Base UI, RTL and Design System | DONE | RTL + Bootstrap + fragments; Chromium 360/768/1440px; mvn clean verify (4 tests); / and /health HTTP 200 |
+| 4 | Admin Security | DONE | Spring Security + BCrypt + sessions + CSRF; 20 tests; browser login/logout + category regression passed |
+| 5 | Categories | DONE | Category migration + admin CRUD + active public categories; 13 tests; responsive verification; / and /health HTTP 200 |
+| 6 | Products | NOT_STARTED | — |
+| 7 | Product Images | NOT_STARTED | — |
+| 8 | Product Catalog | NOT_STARTED | — |
+| 9 | Product Detail | NOT_STARTED | — |
+| 10 | Shopping Cart | NOT_STARTED | — |
+| 11 | Checkout and Orders | NOT_STARTED | — |
 | 12 | Admin Orders | NOT_STARTED | — |
-| 13 | Homepage | NOT_STARTED | — |
-| 14 | Content Module | NOT_STARTED | — |
-| 15 | UX Polish | NOT_STARTED | — |
-| 16 | Docker | NOT_STARTED | — |
-| 17 | Final Testing | NOT_STARTED | — |
-| 18 | V1 Release Preparation | NOT_STARTED | — |
+| 13 | Real Homepage | NOT_STARTED | — |
+| 14 | UX Polish | NOT_STARTED | — |
+| 15 | Docker | NOT_STARTED | — |
+| 16 | Full V1 Testing | NOT_STARTED | — |
+| 17 | V1 Release Preparation | NOT_STARTED | — |
+| 18 | Content Module / V1.1 | NOT_STARTED | — |

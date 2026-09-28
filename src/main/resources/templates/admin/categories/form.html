@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('دسته‌بندی', ~{::content})}">
+<head><title>دسته‌بندی</title></head>
+<body><section th:fragment="content" aria-labelledby="page-title">
+    <nav th:replace="~{admin/navigation :: navigation}"></nav>
+    <div class="row justify-content-center"><div class="col-lg-8">
+        <h1 id="page-title" class="h3 mb-4" th:text="${categoryId == null} ? 'دسته‌بندی جدید' : 'ویرایش دسته‌بندی'"></h1>
+        <form method="post" th:object="${categoryForm}"
+              th:action="${categoryId == null} ? @{/admin/categories} : @{/admin/categories/{id}(id=${categoryId})}">
+            <p th:if="${#fields.hasErrors('*')}" class="alert alert-danger" role="alert">لطفاً خطاهای زیر را اصلاح کنید.</p>
+            <div class="mb-3">
+                <label for="name" class="form-label">نام دسته‌بندی (الزامی)</label>
+                <input id="name" type="text" class="form-control" th:field="*{name}" maxlength="120" required
+                       th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('name')}" aria-describedby="name-errors">
+                <div id="name-errors" class="invalid-feedback" th:errors="*{name}"></div>
+            </div>
+            <div class="mb-3">
+                <label for="slug" class="form-label">نامک (الزامی)</label>
+                <input id="slug" type="text" dir="ltr" class="form-control" th:field="*{slug}" maxlength="120" required
+                       th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('slug')}" aria-describedby="slug-help slug-errors">
+                <div id="slug-help" class="form-text">حروف انگلیسی، عدد و خط تیره؛ مانند <bdi dir="ltr">board-games</bdi>. حروف بزرگ به کوچک تبدیل می‌شوند. نامک باید یکتا باشد.</div>
+                <div id="slug-errors" class="invalid-feedback" th:errors="*{slug}"></div>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">توضیحات</label>
+                <textarea id="description" class="form-control" th:field="*{description}" rows="4" maxlength="2000"
+                          th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('description')}" aria-describedby="description-errors"></textarea>
+                <div id="description-errors" class="invalid-feedback" th:errors="*{description}"></div>
+            </div>
+            <div class="form-check mb-4">
+                <input id="active" class="form-check-input" type="checkbox" th:field="*{active}">
+                <label for="active" class="form-check-label">فعال و قابل نمایش در صفحه اصلی و منو</label>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-primary" type="submit">ذخیره دسته‌بندی</button>
+                <a class="btn btn-outline-secondary" th:href="@{/admin/categories}">بازگشت به فهرست</a>
+            </div>
+        </form>
+    </div></div>
+</section></body>
+</html>

@@ -1,0 +1,61 @@
+package com.noghterangi.category;
+
+import jakarta.validation.Valid;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.server.ResponseStatusException;
+import java.util.List;
+
+@Service
+@Validated
+@Transactional(readOnly = true)
+public class CategoryService {
+    private final CategoryRepository repository;
+
+    public CategoryService(CategoryRepository repository) { this.repository = repository; }
+
+    public List<Category> findAll() { return repository.findAllByOrderByNameAscIdAsc(); }
+    public List<Category> findActive() { return repository.findByActiveTrueOrderByNameAscIdAsc(); }
+    public Category get(Long id) {
+        return repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "دسته‌بندی پیدا نشد."));
+    }
+
+    @Transactional
+    public Category create(@Valid CategoryForm form) {
+        if (repository.existsBySlug(form.getSlug())) { throw new DuplicateCategorySlugException(); }
+        Category category = new Category();
+        category.update(form);
+        return save(category);
+    }
+
+    @Transactional
+    public Category update(Long id, @Valid CategoryForm form) {
+        Category category = get(id);
+        if (repository.existsBySlugAndIdNot(form.getSlug(), id)) { throw new DuplicateCategorySlugException(); }
+        category.update(form);
+        return save(category);
+    }
+
+    @Transactional
+    public void setActive(Long id, boolean active) { get(id).setActive(active); }
+
+    private Category save(Category category) {
+        try {
+            return repository.saveAndFlush(category);
+        } catch (DataIntegrityViolationException exception) {
+            // The unique constraint also protects concurrent requests after the friendly pre-check.
+            for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
+                if (cause instanceof ConstraintViolationException violation
+                        && "uk_category_slug".equals(violation.getConstraintName())) {
+                    throw new DuplicateCategorySlugException();
+                }
+            }
+            throw exception;
+        }
+    }
+}

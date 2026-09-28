@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('مدیریت دسته‌بندی‌ها', ~{::content})}">
+<head><title>مدیریت دسته‌بندی‌ها</title></head>
+<body><section th:fragment="content" aria-labelledby="page-title">
+    <nav th:replace="~{admin/navigation :: navigation}"></nav>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <h1 id="page-title" class="h3 mb-0">مدیریت دسته‌بندی‌ها</h1>
+        <a class="btn btn-primary" th:href="@{/admin/categories/new}">دسته‌بندی جدید</a>
+    </div>
+    <p class="text-muted">فقط دسته‌بندی‌های فعال در صفحه اصلی و منوی عمومی نمایش داده می‌شوند.</p>
+    <p th:if="${#lists.isEmpty(categories)}" class="alert alert-info">هنوز دسته‌بندی‌ای ایجاد نشده است.</p>
+    <ul class="list-unstyled row g-3" th:unless="${#lists.isEmpty(categories)}">
+        <li class="col-12 col-md-6 col-xl-4" th:each="category : ${categories}">
+            <article class="category-card bg-white border text-break" th:attr="data-category-id=${category.id}">
+                <h2 class="h5" th:text="${category.name}"></h2>
+                <dl class="mb-3">
+                    <dt>نامک</dt>
+                    <dd><bdi class="d-block text-break" dir="ltr" th:text="${category.slug}"></bdi></dd>
+                    <dt>وضعیت</dt>
+                    <dd><span class="badge" th:classappend="${category.active} ? 'text-bg-success' : 'text-bg-secondary'"
+                              th:text="${category.active} ? 'فعال' : 'غیرفعال'"></span></dd>
+                </dl>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/categories/{id}/edit(id=${category.id})}"
+                       th:aria-label="'ویرایش ' + ${category.name}">ویرایش</a>
+                    <form method="post" th:action="@{/admin/categories/{id}/active(id=${category.id})}">
+                        <input type="hidden" name="active" th:value="${!category.active}">
+                        <button class="btn btn-outline-secondary" type="submit" th:text="${category.active} ? 'غیرفعال کردن' : 'فعال کردن'"
+                                th:aria-label="(${category.active} ? 'غیرفعال کردن ' : 'فعال کردن ') + ${category.name}"></button>
+                    </form>
+                </div>
+            </article>
+        </li>
+    </ul>
+</section></body>
+</html>

@@ -1,7 +1,7 @@
 # Noghte Rangi — نقطه رنگی
 
 A Persian local online shop built incrementally as a simple Spring Boot modular
-monolith. Current implementation: **Phase 3 — Base UI and RTL**.
+monolith. Current implementation: **Phase 4 — Admin Security**, with **Phase 5 — Categories** already implemented.
 
 ## Prerequisites
 
@@ -19,7 +19,7 @@ export PATH="$JAVA_HOME/bin:$PATH"
 mvn -version
 ```
 Spring Boot 4.1.1 manages dependency versions. The application uses MVC,
-Thymeleaf, Validation, JPA, the PostgreSQL JDBC driver, and Flyway (including
+Thymeleaf, Spring Security, Validation, JPA, the PostgreSQL JDBC driver, and Flyway (including
 its PostgreSQL module). There is no frontend build pipeline.
 
 ## Local configuration
@@ -27,6 +27,7 @@ its PostgreSQL module). There is no frontend build pipeline.
 For a new checkout, copy `.env.example` to `.env` and replace both placeholder
 passwords with different local passwords. Keep the populated file private;
 `.gitignore` excludes it. If `.env` already exists, preserve it.
+Set the required admin username and BCrypt hash as described below before startup.
 
 Compose reads `.env` automatically. Spring Boot does **not**, so export the
 settings before running Maven or the application. In Bash, for a trusted local
@@ -52,6 +53,9 @@ no fallback in application configuration.
 | `TEST_DB_USERNAME` | Test database user; `noghterangi_test` |
 | `TEST_DB_PASSWORD` | Required, separate test database password |
 | `TEST_DB_PORT` | Test container host port; `5433` |
+| `ADMIN_USERNAME` | Required single administrator username; no default |
+| `ADMIN_PASSWORD_HASH` | Required BCrypt hash (cost 10 or higher); no plaintext password |
+| `SESSION_COOKIE_SECURE` | Set `true` with HTTPS; default `false` supports local HTTP |
 | `SERVER_PORT` | Application HTTP port; Spring Boot defaults to `8080` |
 
 If you change a Compose host port, update the corresponding JDBC URL too.
@@ -130,9 +134,9 @@ Flyway records applied versions and checksums in `public.flyway_schema_history`.
 Hibernate's default schema is `noghterangi`, `ddl-auto=validate`, and Open Session
 in View is disabled. SQL script initialization is disabled; Flyway owns DDL.
 
-There are no business entities or tables in this phase, so Hibernate initializes
-successfully in validation mode but has no entity mappings to validate yet.
-Later phases add numbered migrations and entity/schema checks. Do not modify an
+`V2__create_category.sql` adds `noghterangi.category`, including a unique slug
+constraint, a lowercase slug format check, and creation/update timestamps.
+Hibernate validates the Category mapping against PostgreSQL. Do not modify an
 already applied migration; add a new version. Flyway clean is disabled.
 
 ## Manual verification
@@ -146,7 +150,7 @@ docker compose exec -T postgres psql -U noghterangi -d noghterangi -c 'SELECT ve
 docker compose exec -T postgres psql -U noghterangi -d noghterangi -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'noghterangi';"
 ```
 
-Expect HTTP 200 for both routes, migration version `1` with `success = t`, and
+Expect HTTP 200 for both routes, migration versions `1` and `2` with `success = t`, and
 schema `noghterangi`. Restart the app: Flyway should report that it is up to date.
 The `/health` route remains a simple web liveness check, not a live database probe.
 
@@ -161,10 +165,10 @@ There is no application container yet; that belongs to Phase 15.
 
 ## Scope and next phase
 
-Java code lives under `com.noghterangi`. No admin, product, category, cart, or
-order functionality is implemented. Phase 3 will add Bootstrap 5, reusable
-Thymeleaf fragments, Persian typography, RTL layout, and a small design system.
-Development stops after each phase for explicit approval.
+Java code lives under `com.noghterangi`, with categories in the `category` feature
+package. Phase 5 Categories was completed early; Phase 4 now secures all admin routes.
+Products, cart, orders, customer accounts, and content are not implemented.
+Phase 6 Products requires explicit approval; no Git commit is made automatically.
 
 ## UI foundation (Phase 3)
 
@@ -183,10 +187,94 @@ The shell includes head, header/navigation, optional `successMessage` and
 Design variables and decorative CSS illustrations live in `static/css/main.css`.
 Bootstrap 5.3.8 RTL CSS and JavaScript are served locally under `static/vendor/bootstrap`
 with the upstream license; no CDN connection is needed at runtime.
-The homepage contains demo content only; search is disabled and no shopping
-or category routes, entities, or migrations are added.
+The homepage uses real active categories; product illustrations remain demos
+and search is disabled. Category navigation links target homepage category cards
+until the catalog phase adds product browsing.
 
 For browser verification, open `/` at 360px, 768px, and 1440px widths. Check
 Persian text, RTL order, card wrapping, and absence of horizontal scrolling.
 On mobile, open and close the navigation with mouse and keyboard. Tab from the
 address bar to test the skip link and visible focus. Check `/health` returns `OK`.
+
+## Categories (Phase 5 — implemented early)
+
+Open `/admin/categories` to list categories, `/admin/categories/new` to create one,
+and `/admin/categories/{id}/edit` to edit it. Saving and activation changes use
+POST followed by a redirect with a Persian confirmation message. No delete action
+is provided. Sign in at `/admin/login` first; all category management requires an
+authenticated administrator. Existing POST forms automatically include CSRF tokens.
+
+Names are required (maximum 120 characters). Slugs are required, trimmed, and
+converted to lowercase; use English letters, numbers, and single hyphens between
+words, up to 120 characters. Slugs remain unique across active and inactive
+categories. Descriptions are optional, up to 2000 characters. The service checks
+uniqueness, and the database constraint also prevents concurrent duplicates.
+Creation/update timestamps are stored as instants; creation time is preserved on edit.
+
+Manual checks:
+
+1. Create an active category; confirm its name/description appears on `/` and its
+   link appears under the public category navigation menu.
+2. Submit a blank name, invalid slug, and existing slug; confirm field-level
+   Persian errors and preserved form inputs.
+3. Edit the category, retaining its slug; confirm the changes persist.
+4. Deactivate it; confirm it remains in the admin list but disappears from both
+   public cards and navigation. Activate it again and confirm it returns.
+5. Check the admin list/form and homepage at mobile and desktop widths.
+6. Confirm `/health` returns HTTP 200 and both Flyway migrations have succeeded.
+
+Category integration tests use the isolated test database and remove only their
+own uniquely prefixed records. They exercise service validation, PostgreSQL
+constraints, timestamps, public visibility, HTML escaping, and real HTTP admin flows.
+
+## Admin security (Phase 4)
+
+One administrator is configured through `ADMIN_USERNAME` and `ADMIN_PASSWORD_HASH`.
+Spring Security keeps that user in memory; no user table or new migration is needed.
+There is no default account, registration, remember-me, or password reset. Missing,
+malformed, plaintext, or low-cost hashes cause startup to fail with a generic
+configuration message that does not include credential values.
+
+Generate a BCrypt hash locally at cost 12 (minimum accepted: 10). For example,
+if Apache `htpasswd` is installed, it prompts without echoing the password and
+can write the result to a private file instead of the terminal:
+
+```bash
+umask 077
+htpasswd -nBC 12 'your-admin-username' > /tmp/noghterangi-admin-credential
+```
+
+Set `ADMIN_USERNAME` in your private `.env`. Copy only the BCrypt hash after the
+colon in that private file into `ADMIN_PASSWORD_HASH`, enclosed in single quotes
+so Bash preserves the dollar signs. Delete the temporary file after configuration.
+Do not commit `.env`, print hashes, or place real credentials in this README.
+Export `.env` using the existing instructions, then start the application.
+For HTTPS deployments, set `SESSION_COOKIE_SECURE=true`.
+Changing credentials requires an application restart, which also clears sessions.
+
+`GET /admin` and every `/admin/**` route except `/admin/login` require the ADMIN
+role. Successful form login always redirects to `/admin`; invalid credentials
+show a generic Persian message. Public homepage, category cards, health, and
+static resources remain anonymous. Spring Security manages session fixation
+protection. Session cookies are HttpOnly and SameSite=Lax; URL session IDs are disabled.
+
+Logout is a CSRF-protected POST to `/admin/logout`. The admin navigation includes
+its form on the landing page and category pages. Logout clears authentication,
+invalidates the session, deletes the session cookie, and redirects to the login page.
+Thymeleaf `th:action` POST forms automatically include the CSRF token; keep using
+that pattern for future admin forms. CSRF is enabled globally.
+
+Verification:
+
+1. Without cookies, `/` and `/health` return 200; `/admin` and `/admin/categories`
+   redirect to `/admin/login`. The Persian RTL login page and assets return 200.
+2. Invalid credentials show the generic error. Valid credentials redirect to `/admin`.
+3. While signed in, list/create/edit/activate/deactivate categories; check public
+   active-category visibility separately in an anonymous browser session.
+4. Submit an admin POST without its CSRF token: expect 403 and no mutation.
+5. Use the logout button, then revisit `/admin` and `/admin/categories`: both
+   must require login again. GET alone must not log out.
+
+Tests generate isolated, temporary administrator credentials at runtime and use
+real HTTP sessions and form CSRF tokens. They do not read production admin secrets
+or disable authentication/CSRF. No real admin credentials are stored in test files.
