@@ -97,7 +97,7 @@ class CategoryIntegrationTest {
         assertThat(service.findActive()).extracting(Category::getId).contains(active.getId()).doesNotContain(inactive.getId());
         HttpResponse<String> page = get("/");
         assertThat(page.statusCode()).isEqualTo(200);
-        assertThat(page.body()).contains("id=\"category-" + active.getSlug() + "\"", "href=\"/#category-" + active.getSlug() + "\"", "&lt;script&gt;")
+        assertThat(page.body()).contains("id=\"category-" + active.getSlug() + "\"", "href=\"/products?category=" + active.getSlug() + "\"", "&lt;script&gt;")
                 .doesNotContain(inactive.getSlug(), "<script>alert(1)</script>");
         service.setActive(active.getId(), false);
         assertThat(get("/").body()).doesNotContain(active.getSlug(), inactive.getSlug());

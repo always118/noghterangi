@@ -29,14 +29,14 @@
         <div class="row g-3 align-items-center">
             <div class="col-md-5">
                 <h2 id="search-title" class="h5">دنبال چه رنگی از شادی می‌گردی؟</h2>
-                <p id="search-help" class="small text-muted mb-0">جست‌وجو در نسخه‌های بعدی فعال می‌شود.</p>
+                <p id="search-help" class="small text-muted mb-0">محصول دلخواهتان را در فروشگاه پیدا کنید.</p>
             </div>
             <div class="col-md-7">
-                <label class="visually-hidden" for="demo-search">جست‌وجو در فروشگاه (به‌زودی)</label>
-                <div class="d-flex gap-2">
-                    <input id="demo-search" class="form-control" type="search" placeholder="دفتر، مدادرنگی، بازی..." aria-describedby="search-help" disabled>
-                    <button class="btn btn-primary flex-shrink-0" type="button" disabled>جست‌وجو</button>
-                </div>
+                <label class="visually-hidden" for="demo-search">جست‌وجو در فروشگاه</label>
+                <form class="d-flex gap-2" method="get" th:action="@{/products}">
+                    <input id="demo-search" name="q" maxlength="160" class="form-control" type="search" placeholder="دفتر، مدادرنگی، بازی..." aria-describedby="search-help">
+                    <button class="btn btn-primary flex-shrink-0" type="submit">جست‌وجو</button>
+                </form>
             </div>
         </div>
     </section>
@@ -50,7 +50,7 @@
                 <article class="category-card text-break" th:id="'category-' + ${category.slug}"
                          th:classappend="${ {'tone-mint', 'tone-peach', 'tone-lilac', 'tone-sand'}[item.index % 4]}">
                     <span class="category-symbol" aria-hidden="true">✦</span>
-                    <h3 class="h5" th:text="${category.name}"></h3>
+                    <h3 class="h5"><a th:href="@{/products(category=${category.slug})}" th:text="${category.name}"></a></h3>
                     <p class="mb-0" th:if="${!#strings.isEmpty(category.description)}" th:text="${category.description}"></p>
                 </article>
             </div>

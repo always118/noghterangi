@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 7 — Product Images
+Phase 8 — Product Catalog
 
 Status: DONE
 
@@ -16,6 +16,7 @@ Status: DONE
 - Phase 5 — Categories
 - Phase 6 — Products
 - Phase 7 — Product Images
+- Phase 8 — Product Catalog
 
 Note:
 Phase 5 Categories was implemented before Phase 4 because the project
@@ -24,13 +25,13 @@ Admin Security now protects the existing category routes and future admin routes
 
 ## Current Work
 
-Phase 7 complete: local product image storage, protected multiple upload/order/removal,
-primary-image previews, controlled public retrieval, and Persian validation messages.
-All required checks passed. Awaiting explicit approval for Phase 8.
+Phase 8 complete: database-backed public catalog with Persian name search, category/price/
+availability filters, three safe sorts, pagination, reusable RTL cards, and homepage links.
+All required checks passed. Awaiting explicit approval for Phase 9.
 
 ## Next Phase
 
-Phase 8 — Product Catalog (NOT_STARTED; explicit approval required)
+Phase 9 — Product Detail (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
@@ -50,6 +51,7 @@ Phase 8 — Product Catalog (NOT_STARTED; explicit approval required)
 - Product domain and protected admin management
 - Media metadata and replaceable local storage; JPEG/PNG product images
 - active category display on public homepage
+- Public product catalog with PostgreSQL search/filter/sort and Spring Data pagination
 
 ## Important Technical Decisions
 
@@ -77,26 +79,32 @@ Phase 8 — Product Catalog (NOT_STARTED; explicit approval required)
 - Java 21 is required. PostgreSQL runs in Compose; application not containerized.
 - Local images: MEDIA_STORAGE_PATH (default uploads/media), JPEG/PNG only; 5 MiB/file, 10 files/batch.
 - Filesystem/DB are not atomic; crashes or cleanup failures may leave orphan files (documented in README).
+- Catalog search is normalized substring matching on names; no full-text index or search engine.
+- Public visibility uses the product and its own category active flags; parent activation is independent.
 - Temporary runtime credentials/data removed and verification server stopped.
 
 ## Last Verification
 
-- Build: `mvn clean verify` PASSED on Java 21; 43 tests, 0 failures/errors/skipped.
-- Media tests: real JPEG/PNG content, MIME/extension/empty/size/dimension validation,
-  safe filenames/traversal/symlinks, ownership/order/primary selection, exact HTTP retrieval,
-  missing-file handling, removal, transaction rollback cleanup, authentication and CSRF.
-- Existing category/product/admin/security and homepage/health tests all passed.
-- Runtime: packaged application started against PostgreSQL; V5 applied successfully,
-  Hibernate ddl-auto=validate passed, V1–V4 and dependency list unchanged.
-- Chromium: JPEG/PNG upload and display, multiple images including a 10-file batch,
-  reorder/primary preview, removal and empty placeholder passed. Physical storage empty after removal.
-- Invalid type and oversized upload rejected with Persian errors; oversized browser response HTTP 413.
-- Anonymous admin upload/delete blocked; authenticated upload and logout passed; missing CSRF rejected.
-- Product create/edit/price/stock/activation and category create/edit/activation/public visibility passed.
-- Anonymous `/` and `/health` HTTP 200. Public image bytes/MIME and missing image HTTP 404 passed.
-- RTL image management/product list/edit fit 360/768/1440px; mobile/desktop and 413 screenshots reviewed.
-- Temporary runtime product/category/credentials removed; verification server stopped.
-- Phase 8 remains NOT_STARTED. No automatic commit.
+- Build: `mvn clean verify` PASSED using Java 21; 53 tests, 0 failures/errors/skipped.
+- Catalog tests: active visibility, direct-child category filtering, inclusive Long price ranges,
+  stock filtering, all three deterministic sorts, bounded Spring Data pagination, Persian character/
+  whitespace normalization and product renames, literal wildcard search, and combined filters.
+- HTTP tests: anonymous catalog, invalid input fallbacks, escaped names, URL filter preservation
+  including literal plus/ampersand through pagination, primary images/placeholders and missing media.
+- Existing authentication/category/product/media regressions all passed.
+- Runtime: packaged application started; PostgreSQL connection, V6 migration and Hibernate validation passed.
+  V1–V5 and dependencies unchanged. V6 adds only the small normalization function; no demo data migration.
+- Chromium: 20 temporary products across four categories; no filters, search/Persian variants,
+  category/direct-child, min/max price, available-only, all sorts, pagination, combined filters,
+  invalid URLs, empty states, and homepage category links passed.
+- Product primary PNG preview, JPEG/PNG admin upload/order/removal, absent-image placeholder,
+  and physical-file-missing 404 with visible placeholder passed.
+- Admin login/logout, category create/edit/activation, product create/edit/price/activation,
+  image management and CSRF regression passed. Anonymous admin remained protected.
+- `/`, `/products`, and `/health` returned HTTP 200 anonymously.
+- Catalog and homepage fit 360/768/1440px without horizontal overflow; mobile/desktop screenshots reviewed.
+- Temporary 20 products/four categories/credentials removed; image storage empty; verification app stopped.
+- Phase 9 remains NOT_STARTED. No automatic commit.
 
 ## Last Updated
 

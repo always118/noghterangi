@@ -1,7 +1,7 @@
 # Noghte Rangi — نقطه رنگی
 
 A Persian local online shop built incrementally as a simple Spring Boot modular
-monolith. Current implementation: **Phase 7 — Product Images**, with protected category, product, and image administration.
+monolith. Current implementation: **Phase 8 — Product Catalog**, with public browsing and protected category, product, and image administration.
 
 ## Prerequisites
 
@@ -156,7 +156,7 @@ docker compose exec -T postgres psql -U noghterangi -d noghterangi -c 'SELECT ve
 docker compose exec -T postgres psql -U noghterangi -d noghterangi -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'noghterangi';"
 ```
 
-Expect HTTP 200 for both routes, migration versions `1` through `5` with `success = t`, and
+Expect HTTP 200 for both routes, migration versions `1` through `6` with `success = t`, and
 schema `noghterangi`. Restart the app: Flyway should report that it is up to date.
 The `/health` route remains a simple web liveness check, not a live database probe.
 
@@ -174,8 +174,8 @@ There is no application container yet; that belongs to Phase 15.
 Java code lives under `com.noghterangi`, with categories in the `category` feature
 package. Phase 5 Categories was completed early; Phase 4 now secures all admin routes.
 Phase 6 adds the Product domain and protected administration; Phase 7 adds local product images.
-Public catalog, cart, orders, customer accounts, and content are not implemented.
-Phase 8 Product Catalog requires explicit approval; no Git commit is made automatically.
+Phase 8 adds the public catalog. Product detail, cart, orders, customer accounts, and content are not implemented.
+Phase 9 Product Detail requires explicit approval; no Git commit is made automatically.
 
 ## UI foundation (Phase 3)
 
@@ -195,8 +195,7 @@ Design variables and decorative CSS illustrations live in `static/css/main.css`.
 Bootstrap 5.3.8 RTL CSS and JavaScript are served locally under `static/vendor/bootstrap`
 with the upstream license; no CDN connection is needed at runtime.
 The homepage uses real active categories; product illustrations remain demos
-and search is disabled. Category navigation links target homepage category cards
-until the catalog phase adds product browsing.
+while search and category links now open the public catalog. The final homepage is deferred to Phase 13.
 
 For browser verification, open `/` at 360px, 768px, and 1440px widths. Check
 Persian text, RTL order, card wrapping, and absence of horizontal scrolling.
@@ -330,7 +329,7 @@ Manual checks:
    ranges; expect clear Persian errors and no saved changes.
 5. Deactivate/reactivate a product. Check existing category create/edit/activation,
    optional parent selection, public active-category display, `/`, and `/health`.
-6. Check product list/form at 360px, 768px, and 1440px. Image management is described below; the public catalog remains deferred.
+6. Check product list/form at 360px, 768px, and 1440px. Image management and the public catalog are described below.
 
 Product integration tests use real PostgreSQL and authenticated HTTP requests with
 CSRF tokens, and clean up only their uniquely prefixed products/categories.
@@ -342,7 +341,7 @@ Save the product first, then choose **تصاویر** in the product list or **م
 on its edit page. `/admin/products/{id}/images` supports multiple upload, numeric
 ordering, and removal. Save pending product edits before following that link.
 The first image ordered by `sortOrder`, then ID, is primary. Products without
-images show a text placeholder. No public catalog or product deletion is added.
+images show a text placeholder. Product deletion remains unavailable. The Phase 8 public catalog reuses these images.
 
 `Media` holds the product relationship, original filename metadata, generated
 filename, MIME type, byte size, order, and creation time. `MediaService` manages
@@ -390,3 +389,66 @@ Manual checks:
 Tests use a temporary image directory, real PostgreSQL, and real HTTP multipart
 requests. They cover content/size/path checks, image ownership, ordering, retrieval,
 removal, rollback cleanup, authentication, and CSRF alongside existing regressions.
+
+
+## Public product catalog (Phase 8)
+
+Anonymous `GET /products` renders the catalog. All search/filter/sort/page operations
+run in PostgreSQL through `CatalogController → CatalogService → ProductRepository`
+and Spring Data `Specification`/`Pageable`. The fixed page size is 12, defined in
+`CatalogFilter.PAGE_SIZE`. The media query retrieves only one primary image per
+product on the requested page; product collections are never filtered in memory.
+
+Supported URL parameters:
+
+| Parameter | Behavior |
+| --- | --- |
+| `q` | Literal substring of product name, up to 160 characters; Persian normalization and case-insensitive matching |
+| `category` | Active category slug; includes that category and its active direct children |
+| `minPrice`, `maxPrice` | Inclusive, nonnegative `Long` prices in whole Toman |
+| `available=true` | Stock greater than zero |
+| `sort` | Exactly `NEWEST` (default), `LOWEST_PRICE`, or `HIGHEST_PRICE` |
+| `page` | Zero-based page index; default 0 |
+
+Every result requires an active product and its own active category. A category's
+active state remains independent of its parent; filtering by an inactive parent
+is rejected. Zero-stock products otherwise remain visible with **ناموجود**.
+Newest uses creation time descending; price sorts use price ascending/descending.
+All sorts use descending ID as the final deterministic tie-breaker.
+
+`V6__add_persian_search_normalization.sql` adds the small immutable PostgreSQL
+`noghterangi.normalize_persian(text)` function; prior migrations are unchanged.
+It maps Arabic `ي`/`ك` to Persian `ی`/`ک`, converts common whitespace (including
+NBSP and half-space) to spaces, trims, and collapses repetitions. The Java
+`PersianTextNormalizer` uses the same rules for query text. Database normalization
+runs on the current product name, so existing records and renamed products need
+no backfill or duplicated search field. `%`, `_`, and `!` are escaped as literal
+LIKE text. No search engine, extension, or extra dependency is required.
+
+This is intentionally a small-shop substring scan, not indexed full-text search.
+It searches names only and does not remove diacritics or transliterate words.
+Half-space becomes a space, so a query without either separator is not equivalent.
+Large inventories may need a later measured indexing/search change.
+
+Invalid prices or reversed ranges show Persian messages and no results. Unknown
+or inactive category slugs also show a message and no results. Invalid sort and
+negative/malformed/overflowing page values fall back to NEWEST/page 0 with a message.
+A valid page beyond the result set is empty and offers a link to page 0 with the
+same filters. URL pagination preserves all filters, including reserved characters
+in search text; filters are never stored in a session. Submitting the GET form
+starts from page 0. Pagination shows previous/next and at most three nearby numbers.
+
+The reusable `fragments/catalog-card.html` displays primary image/placeholder,
+a two-line name, whole Toman price, availability, and featured badge. A small image
+error listener shows the placeholder if a physical file is missing; filtering
+itself uses ordinary GET forms without JavaScript. Cards have no detail or cart
+links in this phase. Homepage demo sections remain intact; only search/category
+navigation now opens `/products`.
+
+Manual checks: browse without filters, search both Persian character variants,
+select a category/price range/availability, exercise each sort and next/previous,
+combine filters, and check the empty state and invalid URLs. Confirm filters
+persist, homepage category links work, images and missing-image placeholders render,
+and layouts fit 360/768/1440px. Then verify admin login, categories, products, and
+image upload/order/removal. Demo data must be temporary development-only fixtures,
+never production migrations. No permanent automatic seed is installed.

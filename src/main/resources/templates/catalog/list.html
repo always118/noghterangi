@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('محصولات', ~{::content})}">
+<head><title>محصولات</title></head>
+<body><section th:fragment="content" aria-labelledby="catalog-title">
+    <script th:src="@{/js/catalog-images.js}" defer></script>
+    <h1 id="catalog-title" class="h2 mb-4">محصولات نقطه رنگی</h1>
+    <details class="catalog-filters border rounded p-3 mb-4" open>
+        <summary class="fw-bold mb-3">جست‌وجو و فیلتر محصولات</summary>
+        <form method="get" th:action="@{/products}" class="row g-3" role="search" aria-label="جست‌وجوی محصولات">
+            <div class="col-12 col-md-6">
+                <label for="catalog-q" class="form-label">نام محصول</label>
+                <input id="catalog-q" name="q" class="form-control" type="search" maxlength="160" th:value="${filter.q}" placeholder="دفتر، مدادرنگی، بازی...">
+            </div>
+            <div class="col-6 col-md-3">
+                <label for="catalog-category" class="form-label">دسته‌بندی</label>
+                <select id="catalog-category" name="category" class="form-select">
+                    <option value="">همه دسته‌بندی‌ها</option>
+                    <option th:each="category : ${activeCategories}" th:value="${category.slug}" th:text="${category.name}" th:selected="${category.slug == filter.category}"></option>
+                </select>
+            </div>
+            <div class="col-6 col-md-3">
+                <label for="catalog-sort" class="form-label">ترتیب نمایش</label>
+                <select id="catalog-sort" name="sort" class="form-select">
+                    <option th:each="sort : ${sorts}" th:value="${sort}" th:text="${sort.label}" th:selected="${sort == filter.sort}"></option>
+                </select>
+            </div>
+            <div class="col-6 col-md-3">
+                <label for="catalog-min" class="form-label">حداقل قیمت (تومان)</label>
+                <input id="catalog-min" name="minPrice" class="form-control" inputmode="numeric" th:value="${filter.minPrice}">
+            </div>
+            <div class="col-6 col-md-3">
+                <label for="catalog-max" class="form-label">حداکثر قیمت (تومان)</label>
+                <input id="catalog-max" name="maxPrice" class="form-control" inputmode="numeric" th:value="${filter.maxPrice}">
+            </div>
+            <div class="col-12 col-md-3 d-flex align-items-end">
+                <div class="form-check mb-2">
+                    <input id="catalog-available" name="available" value="true" type="checkbox" class="form-check-input" th:checked="${filter.available}">
+                    <label for="catalog-available" class="form-check-label">فقط کالاهای موجود</label>
+                </div>
+            </div>
+            <div class="col-12 col-md-3 d-flex flex-wrap align-items-end gap-2">
+                <button class="btn btn-primary" type="submit">اعمال فیلترها</button>
+                <a class="btn btn-outline-secondary" th:href="@{/products}">پاک کردن فیلترها</a>
+            </div>
+        </form>
+    </details>
+    <div th:if="${!#lists.isEmpty(filter.messages)}" class="alert alert-warning" role="alert">
+        <p class="mb-1" th:each="message : ${filter.messages}" th:text="${message}"></p>
+    </div>
+    <p class="text-muted" th:text="${products.totalElements} + ' محصول'"></p>
+    <div th:if="${products.empty}" class="alert alert-info" id="catalog-empty">
+        <p>محصولی با این مشخصات پیدا نشد.</p>
+        <a th:href="@{/products}" class="alert-link">مشاهده همه محصولات</a>
+        <a th:if="${filter.page > 0}" th:href="${firstUrl}" class="alert-link d-block mt-2">صفحه اول همین جست‌وجو</a>
+    </div>
+    <ul class="row g-3 list-unstyled" th:unless="${products.empty}" aria-label="محصولات">
+        <li class="col-6 col-md-4 col-xl-3" th:each="product : ${products.content}">
+            <article th:replace="~{fragments/catalog-card :: card(${product}, ${primaryImages[product.id]})}"></article>
+        </li>
+    </ul>
+    <nav th:if="${products.totalPages > 1}" aria-label="صفحه‌های محصولات" class="mt-4">
+        <ul class="pagination justify-content-center flex-wrap gap-1">
+            <li class="page-item" th:classappend="${previousUrl == null} ? 'disabled'">
+                <a th:if="${previousUrl != null}" class="page-link" th:href="${previousUrl}" rel="prev">قبلی</a>
+                <span th:if="${previousUrl == null}" class="page-link" aria-disabled="true">قبلی</span>
+            </li>
+            <li th:each="link : ${pageLinks}" class="page-item" th:classappend="${link.current} ? 'active'">
+                <a class="page-link" th:href="${link.url}" th:text="${link.number}" th:aria-label="'صفحه ' + ${link.number}" th:aria-current="${link.current} ? 'page' : null"></a>
+            </li>
+            <li class="page-item" th:classappend="${nextUrl == null} ? 'disabled'">
+                <a th:if="${nextUrl != null}" class="page-link" th:href="${nextUrl}" rel="next">بعدی</a>
+                <span th:if="${nextUrl == null}" class="page-link" aria-disabled="true">بعدی</span>
+            </li>
+        </ul>
+    </nav>
+</section></body>
+</html>

@@ -33,7 +33,7 @@ public class MediaService {
     public Map<Long, Long> primaryImages(List<Long> productIds) {
         Map<Long, Long> result = new HashMap<>();
         if (!productIds.isEmpty()) {
-            for (Media media : repository.findByProductIdInOrderBySortOrderAscIdAsc(productIds)) {
+            for (Media media : repository.findPrimaryImages(productIds)) {
                 result.putIfAbsent(media.getProduct().getId(), media.getId());
             }
         }

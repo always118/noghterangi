@@ -78,3 +78,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 /* Product images preserve their proportions within the existing RTL cards. */
 .product-image { width: 100%; height: 12rem; object-fit: contain; background: var(--bs-tertiary-bg, #f8f9fa); border-radius: .5rem; }
 .image-placeholder { display: flex; align-items: center; justify-content: center; color: var(--bs-secondary-color, #6c757d); }
+
+.catalog-filters { background: var(--bs-body-bg, #fff); }
+.catalog-filters summary { cursor: pointer; }
+.catalog-image { height: 11rem; background: #f8f9fa; overflow: hidden; }
+.catalog-image img { width: 100%; height: 100%; object-fit: contain; }
+.catalog-image [hidden] { display: none !important; }
+.catalog-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; line-height: 1.7; }
+.catalog-price { overflow-wrap: anywhere; }
+@media (max-width: 575.98px) {
+    .catalog-image { height: 9rem; }
+    .catalog-card .card-body { padding: .75rem; }
+}
