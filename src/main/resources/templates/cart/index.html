@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('سبد خرید', ~{::content})}">
+<head><title>سبد خرید</title></head>
+<body><section th:fragment="content">
+    <script th:src="@{/js/catalog-images.js}" defer></script>
+    <h1 class="h2 mb-4">سبد خرید</h1>
+    <div th:if="${#lists.isEmpty(cartView.lines)}" class="text-center py-5">
+        <p class="h4">سبد خریدت هنوز خالیه 🌈</p>
+        <a class="btn btn-primary mt-3" th:href="@{/products}">مشاهده محصولات</a>
+    </div>
+    <th:block th:unless="${#lists.isEmpty(cartView.lines)}">
+        <p class="text-muted">قیمت و موجودی به‌روز نمایش داده می‌شود. کالاها تا ثبت سفارش رزرو نمی‌شوند.</p>
+        <div th:unless="${cartView.valid}" class="alert alert-warning" role="alert">سبد نیاز به اصلاح دارد؛ کالاهای ناموجود را حذف و تعداد را با موجودی هماهنگ کنید.</div>
+        <article th:each="line : ${cartView.lines}" class="border rounded p-3 mb-3" th:attr="data-product-id=${line.productId}">
+            <div class="row g-3">
+                <div class="col-4 col-md-2">
+                    <span class="image-placeholder" th:hidden="${line.imageId != null}">بدون تصویر</span>
+                    <img th:if="${line.imageId != null}" data-catalog-image class="img-fluid rounded" width="160" height="120"
+                         th:src="@{/media/{id}(id=${line.imageId})}" th:alt="${line.product != null ? line.product.name : 'محصول'}">
+                </div>
+                <div class="col-8 col-md-4 text-break">
+                    <h2 class="h5" th:text="${line.product != null ? line.product.name : 'محصول حذف‌شده'}"></h2>
+                    <p th:if="${line.product != null}">قیمت واحد: <bdi th:text="${#numbers.formatInteger(line.product.price, 1, 'COMMA')}"></bdi> تومان</p>
+                    <p th:if="${line.warning == null}" class="text-success">موجود</p>
+                    <p th:if="${line.warning != null}" class="text-danger" role="alert" th:text="${line.warning}"></p>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="d-flex flex-wrap align-items-end gap-2">
+                        <form th:action="@{/cart/items/{id}(id=${line.productId})}" method="post">
+                            <button class="btn btn-outline-secondary p-3" name="action" value="decrease" aria-label="کاهش تعداد" th:disabled="${line.quantity <= 1}">−</button>
+                        </form>
+                        <form th:action="@{/cart/items/{id}(id=${line.productId})}" method="post" class="d-flex flex-wrap align-items-end gap-2">
+                            <div><label class="form-label" th:for="'quantity-' + ${line.productId}">تعداد</label>
+                                <input class="form-control quantity-input" th:id="'quantity-' + ${line.productId}" name="quantity" type="number" min="1" step="1" required th:value="${line.quantity}"
+                                       th:max="${line.product != null and line.product.stockQuantity > 0 ? line.product.stockQuantity : 1}"></div>
+                            <button class="btn btn-outline-primary py-3" name="action" value="update">به‌روزرسانی</button>
+                        </form>
+                        <form th:action="@{/cart/items/{id}(id=${line.productId})}" method="post">
+                            <button class="btn btn-outline-secondary p-3" name="action" value="increase" aria-label="افزایش تعداد"
+                                    th:disabled="${line.warning != null or (line.product != null and line.quantity >= line.product.stockQuantity)}">+</button>
+                        </form>
+                        <form th:action="@{/cart/items/{id}(id=${line.productId})}" method="post">
+                            <button class="btn btn-outline-danger py-3" name="action" value="remove">حذف</button>
+                        </form>
+                    </div>
+                    <p class="mt-3 mb-0 text-break">جمع ردیف: <span th:if="${line.total != null}"><bdi th:text="${#numbers.formatInteger(line.total, 1, 'COMMA')}"></bdi> تومان</span><span th:if="${line.total == null}">قابل محاسبه نیست</span></p>
+                </div>
+            </div>
+        </article>
+        <p class="h5 text-break" id="cart-subtotal">جمع کالاها: <span th:if="${cartView.subtotal != null}"><bdi th:text="${#numbers.formatInteger(cartView.subtotal, 1, 'COMMA')}"></bdi> تومان</span><span th:if="${cartView.subtotal == null}">مبلغ بیش از حد مجاز است؛ تعداد را کاهش دهید.</span></p>
+        <p class="small text-muted">جمع شامل ردیف‌های نیازمند اصلاح نیز هست؛ هزینه ارسال محاسبه نشده است.</p>
+        <div class="d-flex flex-wrap gap-3 mt-4">
+            <a class="btn btn-primary" th:href="@{/products}">ادامه خرید</a>
+            <form th:action="@{/cart/clear}" method="post"><button class="btn btn-outline-danger">خالی کردن سبد</button></form>
+        </div>
+    </th:block>
+</section></body></html>

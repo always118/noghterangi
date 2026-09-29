@@ -55,8 +55,8 @@ class ProductDetailIntegrationTest {
                 "/products?category=" + category.getSlug(), "مسیر صفحه", "موجودی: 7 عدد", "dir=\"rtl\"");
         String input = tag(response.body(), "input", "quantity");
         assertThat(input).contains("min=\"1\"", "max=\"7\"", "step=\"1\"", "value=\"1\"").doesNotContain("disabled");
-        assertThat(tag(response.body(), "button", "add-to-cart")).contains("disabled", "type=\"button\"");
-        assertThat(response.body()).contains("در حال حاضر امکان افزودن به سبد خرید وجود ندارد").doesNotContain("action=\"/cart", "th:");
+        assertThat(tag(response.body(), "button", "add-to-cart")).contains("type=\"submit\"").doesNotContain("disabled");
+        assertThat(response.body()).contains("action=\"/cart/items\"", "name=\"_csrf\"").doesNotContain("th:");
         assertThat(browser.getHtml("/products?category=" + category.getSlug()).body()).contains("href=\"" + path() + "\"");
     }
 
@@ -73,7 +73,7 @@ class ProductDetailIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(200); assertThat(response.body()).contains("ناموجود");
         assertThat(tag(response.body(), "input", "quantity")).contains("disabled", "min=\"1\"", "max=\"1\"");
         assertThat(tag(response.body(), "button", "add-to-cart")).contains("disabled");
-        assertThat(response.body()).doesNotContain("موجودی: 0", "action=\"/cart");
+        assertThat(response.body()).doesNotContain("موجودی: 0");
     }
 
     @Test void optionalTextIsOmittedAndDescriptionIsEscapedPlainText() throws Exception {

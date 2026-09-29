@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 9 — Product Detail
+Phase 10 — Shopping Cart
 
 Status: DONE
 
@@ -18,6 +18,7 @@ Status: DONE
 - Phase 7 — Product Images
 - Phase 8 — Product Catalog
 - Phase 9 — Product Detail
+- Phase 10 — Shopping Cart
 
 Note:
 Phase 5 Categories was implemented before Phase 4 because the project
@@ -26,13 +27,13 @@ Admin Security now protects the existing category routes and future admin routes
 
 ## Current Work
 
-Phase 9 complete: public slug-based product detail, accessible gallery, safe descriptions,
-optional game specifications, stock-bounded quantity UI, and clearly disabled Add to Cart.
-All required checks passed. Awaiting explicit approval for Phase 10.
+Phase 10 complete: anonymous session cart, current product prices and availability,
+server-side quantity validation, RTL cart page, quantity badge, and CSRF-protected forms.
+All required build, runtime, browser, and regression checks passed. Phase 11 awaits approval.
 
 ## Next Phase
 
-Phase 10 — Shopping Cart (NOT_STARTED; explicit approval required)
+Phase 11 — Checkout and Orders (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
@@ -54,6 +55,7 @@ Phase 10 — Shopping Cart (NOT_STARTED; explicit approval required)
 - active category display on public homepage
 - Public product catalog with PostgreSQL search/filter/sort and Spring Data pagination
 - Public product detail by slug with gallery, breadcrumbs, and friendly 404
+- Anonymous HTTP-session cart with product-detail add, quantity controls, subtotal, and navigation badge
 
 ## Important Technical Decisions
 
@@ -83,32 +85,34 @@ Phase 10 — Shopping Cart (NOT_STARTED; explicit approval required)
 - Filesystem/DB are not atomic; crashes or cleanup failures may leave orphan files (documented in README).
 - Catalog search is normalized substring matching on names; no full-text index or search engine.
 - Public visibility uses the product and its own category active flags; parent activation is independent.
-- Add to Cart remains explicitly disabled until Phase 10; quantity UI reserves no stock.
+- Cart stores only product IDs and quantities in the HTTP session; no cart tables or migration.
+- Current prices are reloaded; stock reductions and unavailable/deleted products remain visible with warnings.
+- Invalid quantity changes are rejected with Persian messages; use direct update to correct stock excess.
+- Badge counts all stored quantities, including unavailable items; subtotal includes resolvable warning rows.
+- Long Toman multiplication/addition overflow suppresses the affected total and marks the cart invalid.
+- Session expiry or invalidation loses the cart. No checkout or stock reservation is implemented.
 - Temporary runtime credentials/data removed and verification server stopped.
 
 ## Last Verification
 
-- Build: `mvn clean verify` PASSED on Java 21; 60 tests, 0 failures/errors/skipped.
-- Detail tests: anonymous slug access, active product/category visibility, friendly unknown/inactive
-  404, formatted prices, unavailable state, stock-bounded quantity, disabled cart control,
-  category/catalog links, escaped optional text, populated/null game fields, ordered images and placeholders.
-- Existing security/category/product/media/catalog regression tests passed, including new card links.
-- Runtime: packaged application started against PostgreSQL; Flyway V1–V6 validation and Hibernate
-  ddl-auto=validate succeeded. No migration or dependency changes required.
-- Anonymous `/`, `/health`, `/products`, and active detail returned HTTP 200;
-  unknown/inactive product and inactive-category detail returned friendly HTTP 404.
-- Chromium: catalog-to-detail navigation, breadcrumbs/category links, price/availability,
-  multiline escaped descriptions, board-game fields, and no-image placeholder passed.
-- Gallery: JPEG/PNG upload/order, primary image selection by mouse and keyboard,
-  physical-file-missing fallback, and image removal passed.
-- Quantity: zero/negative/above-stock values failed native validity; in-stock quantity remained usable;
-  unavailable quantity and all Add to Cart controls disabled. No cart backend or submitting cart form added.
-- Product detail/catalog/home fit 360/768/1440px without horizontal overflow;
-  price remained visible early, thumbnail targets were usable, and mobile/desktop screenshots reviewed.
-- Admin login/logout, category CRUD/activation, product CRUD/activation, images/CSRF,
-  and catalog search/filter/sort/pagination regressions passed with 20 temporary products in four categories.
-- Temporary fixtures/credentials removed; image storage empty; verification server stopped.
-- Phase 10 remains NOT_STARTED. No automatic commit.
+- `mvn clean verify` PASSED using Java 21: 67 tests, 0 failures/errors/skipped.
+- Seven cart integration tests cover empty/session-isolated carts, add/merge/increase/decrease/update,
+  invalid/malformed/overflowing quantities, stock bounds, remove/clear, multi-product totals, badge,
+  current prices, inactive category/product, zero stock, deleted product, money overflow, CSRF,
+  anonymous access, and protected admin routes. Updated product detail tests passed.
+- Packaged application started against PostgreSQL; Flyway V1–V6 and Hibernate validation passed.
+  No migration, dependency, or security-rule changes.
+- Anonymous `/`, `/health`, `/products`, active product detail, and `/cart` returned HTTP 200.
+- Chromium passed empty/add/merge/increase/decrease/direct-update/remove/clear, badge and subtotal,
+  Persian success/error flashes, live admin price/stock/inactive changes, out-of-stock handling,
+  missing-image fallback, and CSRF rejection on every cart POST route.
+- Cart forms also passed with JavaScript disabled in an independent anonymous session.
+- Cart/home/catalog/detail fit 360/768/1440px without horizontal overflow; RTL, touch targets,
+  and cart screenshots at all three widths were checked.
+- Browser regressions passed: admin login/logout, category edit/activation, product create/edit/activation,
+  image upload/order/removal/fallback, catalog search/filter/sort/pagination, and detail gallery/keyboard/404.
+- Temporary 20 products, four categories, images, credentials, and storage removed; server stopped.
+- Phase 10 DONE. Phase 11 remains NOT_STARTED. No automatic commit.
 
 ## Last Updated
 

@@ -21,13 +21,14 @@
                th:text="${product.stockQuantity > 0} ? 'موجود' : 'ناموجود'"></p>
             <p th:if="${product.stockQuantity > 0}" class="small text-muted" th:text="'موجودی: ' + ${product.stockQuantity} + ' عدد'"></p>
             <p th:if="${!#strings.isEmpty(product.shortDescription)}" class="product-description" th:text="${product.shortDescription}"></p>
-            <div class="border rounded p-3" aria-describedby="cart-help">
+            <form class="border rounded p-3" th:action="@{/cart/items}" method="post" aria-describedby="cart-help">
+                <input type="hidden" name="productId" th:value="${product.id}">
                 <label for="quantity" class="form-label">تعداد</label>
                 <input id="quantity" name="quantity" class="form-control quantity-input mb-3" type="number" min="1" step="1" value="1" required
                        th:max="${product.stockQuantity > 0} ? ${product.stockQuantity} : 1" th:disabled="${product.stockQuantity <= 0}" aria-describedby="cart-help">
-                <button id="add-to-cart" class="btn btn-primary" type="button" disabled aria-describedby="cart-help">افزودن به سبد خرید</button>
-                <p id="cart-help" class="small text-muted mt-2 mb-0">خرید آنلاین به‌زودی فعال می‌شود؛ در حال حاضر امکان افزودن به سبد خرید وجود ندارد.</p>
-            </div>
+                <button id="add-to-cart" class="btn btn-primary" type="submit" th:disabled="${product.stockQuantity <= 0}" aria-describedby="cart-help">افزودن به سبد خرید</button>
+                <p id="cart-help" class="small text-muted mt-2 mb-0">افزودن به سبد خرید موجودی را رزرو نمی‌کند؛ قیمت و موجودی فعلی در سبد نمایش داده می‌شود.</p>
+            </form>
         </section>
         <section class="col-md-6 order-md-1" aria-label="تصاویر محصول" data-product-gallery>
             <div class="detail-main-image border rounded">
