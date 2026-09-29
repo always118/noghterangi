@@ -90,3 +90,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
     .catalog-image { height: 9rem; }
     .catalog-card .card-body { padding: .75rem; }
 }
+
+.product-description { white-space: pre-wrap; overflow-wrap: anywhere; }
+.product-detail { overflow-wrap: anywhere; }
+.quantity-input { max-width: 8rem; }
+.detail-main-image { height: min(70vw, 22rem); background: #f8f9fa; overflow: hidden; }
+.detail-main-image img { width: 100%; height: 100%; object-fit: contain; }
+.gallery-thumbnail { display: block; width: 80px; height: 64px; overflow: hidden; }
+.gallery-thumbnail img { width: 100%; height: 100%; object-fit: contain; }
+.gallery-thumbnail[aria-current="true"] { outline: 2px solid var(--bs-primary); outline-offset: 2px; }
+.gallery-thumbnails { max-height: 10rem; overflow-y: auto; padding: .25rem; }
+[data-product-gallery] [hidden] { display: none !important; }

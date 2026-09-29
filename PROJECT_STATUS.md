@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 8 — Product Catalog
+Phase 9 — Product Detail
 
 Status: DONE
 
@@ -17,6 +17,7 @@ Status: DONE
 - Phase 6 — Products
 - Phase 7 — Product Images
 - Phase 8 — Product Catalog
+- Phase 9 — Product Detail
 
 Note:
 Phase 5 Categories was implemented before Phase 4 because the project
@@ -25,13 +26,13 @@ Admin Security now protects the existing category routes and future admin routes
 
 ## Current Work
 
-Phase 8 complete: database-backed public catalog with Persian name search, category/price/
-availability filters, three safe sorts, pagination, reusable RTL cards, and homepage links.
-All required checks passed. Awaiting explicit approval for Phase 9.
+Phase 9 complete: public slug-based product detail, accessible gallery, safe descriptions,
+optional game specifications, stock-bounded quantity UI, and clearly disabled Add to Cart.
+All required checks passed. Awaiting explicit approval for Phase 10.
 
 ## Next Phase
 
-Phase 9 — Product Detail (NOT_STARTED; explicit approval required)
+Phase 10 — Shopping Cart (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
@@ -52,6 +53,7 @@ Phase 9 — Product Detail (NOT_STARTED; explicit approval required)
 - Media metadata and replaceable local storage; JPEG/PNG product images
 - active category display on public homepage
 - Public product catalog with PostgreSQL search/filter/sort and Spring Data pagination
+- Public product detail by slug with gallery, breadcrumbs, and friendly 404
 
 ## Important Technical Decisions
 
@@ -81,30 +83,32 @@ Phase 9 — Product Detail (NOT_STARTED; explicit approval required)
 - Filesystem/DB are not atomic; crashes or cleanup failures may leave orphan files (documented in README).
 - Catalog search is normalized substring matching on names; no full-text index or search engine.
 - Public visibility uses the product and its own category active flags; parent activation is independent.
+- Add to Cart remains explicitly disabled until Phase 10; quantity UI reserves no stock.
 - Temporary runtime credentials/data removed and verification server stopped.
 
 ## Last Verification
 
-- Build: `mvn clean verify` PASSED using Java 21; 53 tests, 0 failures/errors/skipped.
-- Catalog tests: active visibility, direct-child category filtering, inclusive Long price ranges,
-  stock filtering, all three deterministic sorts, bounded Spring Data pagination, Persian character/
-  whitespace normalization and product renames, literal wildcard search, and combined filters.
-- HTTP tests: anonymous catalog, invalid input fallbacks, escaped names, URL filter preservation
-  including literal plus/ampersand through pagination, primary images/placeholders and missing media.
-- Existing authentication/category/product/media regressions all passed.
-- Runtime: packaged application started; PostgreSQL connection, V6 migration and Hibernate validation passed.
-  V1–V5 and dependencies unchanged. V6 adds only the small normalization function; no demo data migration.
-- Chromium: 20 temporary products across four categories; no filters, search/Persian variants,
-  category/direct-child, min/max price, available-only, all sorts, pagination, combined filters,
-  invalid URLs, empty states, and homepage category links passed.
-- Product primary PNG preview, JPEG/PNG admin upload/order/removal, absent-image placeholder,
-  and physical-file-missing 404 with visible placeholder passed.
-- Admin login/logout, category create/edit/activation, product create/edit/price/activation,
-  image management and CSRF regression passed. Anonymous admin remained protected.
-- `/`, `/products`, and `/health` returned HTTP 200 anonymously.
-- Catalog and homepage fit 360/768/1440px without horizontal overflow; mobile/desktop screenshots reviewed.
-- Temporary 20 products/four categories/credentials removed; image storage empty; verification app stopped.
-- Phase 9 remains NOT_STARTED. No automatic commit.
+- Build: `mvn clean verify` PASSED on Java 21; 60 tests, 0 failures/errors/skipped.
+- Detail tests: anonymous slug access, active product/category visibility, friendly unknown/inactive
+  404, formatted prices, unavailable state, stock-bounded quantity, disabled cart control,
+  category/catalog links, escaped optional text, populated/null game fields, ordered images and placeholders.
+- Existing security/category/product/media/catalog regression tests passed, including new card links.
+- Runtime: packaged application started against PostgreSQL; Flyway V1–V6 validation and Hibernate
+  ddl-auto=validate succeeded. No migration or dependency changes required.
+- Anonymous `/`, `/health`, `/products`, and active detail returned HTTP 200;
+  unknown/inactive product and inactive-category detail returned friendly HTTP 404.
+- Chromium: catalog-to-detail navigation, breadcrumbs/category links, price/availability,
+  multiline escaped descriptions, board-game fields, and no-image placeholder passed.
+- Gallery: JPEG/PNG upload/order, primary image selection by mouse and keyboard,
+  physical-file-missing fallback, and image removal passed.
+- Quantity: zero/negative/above-stock values failed native validity; in-stock quantity remained usable;
+  unavailable quantity and all Add to Cart controls disabled. No cart backend or submitting cart form added.
+- Product detail/catalog/home fit 360/768/1440px without horizontal overflow;
+  price remained visible early, thumbnail targets were usable, and mobile/desktop screenshots reviewed.
+- Admin login/logout, category CRUD/activation, product CRUD/activation, images/CSRF,
+  and catalog search/filter/sort/pagination regressions passed with 20 temporary products in four categories.
+- Temporary fixtures/credentials removed; image storage empty; verification server stopped.
+- Phase 10 remains NOT_STARTED. No automatic commit.
 
 ## Last Updated
 

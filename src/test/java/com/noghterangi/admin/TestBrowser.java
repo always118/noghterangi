@@ -28,6 +28,11 @@ public class TestBrowser implements AutoCloseable {
 
     public HttpResponse<String> get(String path) throws Exception { return request(path, null); }
 
+    public HttpResponse<String> getHtml(String path) throws Exception {
+        return client.send(HttpRequest.newBuilder(URI.create(baseUrl + path)).header("Accept", "text/html")
+                .timeout(Duration.ofSeconds(15)).GET().build(), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
+
     public HttpResponse<String> post(String path, Map<String, String> fields) throws Exception {
         String body = fields.entrySet().stream()
                 .map(e -> URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8) + "="

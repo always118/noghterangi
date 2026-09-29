@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('صفحه پیدا نشد', ~{::content})}">
+<head><title>صفحه پیدا نشد</title></head>
+<body><section th:fragment="content" aria-labelledby="not-found-title">
+    <h1 id="not-found-title" class="h3">صفحه پیدا نشد</h1>
+    <p>این صفحه یا محصول در دسترس نیست. می‌توانید محصولات موجود را در فروشگاه ببینید.</p>
+    <a class="btn btn-primary" th:href="@{/products}">مشاهده محصولات</a>
+    <a class="btn btn-outline-secondary" th:href="@{/}">بازگشت به خانه</a>
+</section></body>
+</html>

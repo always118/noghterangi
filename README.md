@@ -1,7 +1,7 @@
 # Noghte Rangi — نقطه رنگی
 
 A Persian local online shop built incrementally as a simple Spring Boot modular
-monolith. Current implementation: **Phase 8 — Product Catalog**, with public browsing and protected category, product, and image administration.
+monolith. Current implementation: **Phase 9 — Product Detail**, with public browsing and protected category, product, and image administration.
 
 ## Prerequisites
 
@@ -174,8 +174,8 @@ There is no application container yet; that belongs to Phase 15.
 Java code lives under `com.noghterangi`, with categories in the `category` feature
 package. Phase 5 Categories was completed early; Phase 4 now secures all admin routes.
 Phase 6 adds the Product domain and protected administration; Phase 7 adds local product images.
-Phase 8 adds the public catalog. Product detail, cart, orders, customer accounts, and content are not implemented.
-Phase 9 Product Detail requires explicit approval; no Git commit is made automatically.
+Phase 8 adds the public catalog. Phase 9 adds public product detail. Cart, orders, customer accounts, and content are not implemented.
+Phase 10 Shopping Cart requires explicit approval; no Git commit is made automatically.
 
 ## UI foundation (Phase 3)
 
@@ -441,8 +441,7 @@ starts from page 0. Pagination shows previous/next and at most three nearby numb
 The reusable `fragments/catalog-card.html` displays primary image/placeholder,
 a two-line name, whole Toman price, availability, and featured badge. A small image
 error listener shows the placeholder if a physical file is missing; filtering
-itself uses ordinary GET forms without JavaScript. Cards have no detail or cart
-links in this phase. Homepage demo sections remain intact; only search/category
+itself uses ordinary GET forms without JavaScript. Card names link to the Phase 9 detail page; no cart functionality is implemented. Homepage demo sections remain intact; only search/category
 navigation now opens `/products`.
 
 Manual checks: browse without filters, search both Persian character variants,
@@ -452,3 +451,43 @@ persist, homepage category links work, images and missing-image placeholders ren
 and layouts fit 360/768/1440px. Then verify admin login, categories, products, and
 image upload/order/removal. Demo data must be temporary development-only fixtures,
 never production migrations. No permanent automatic seed is installed.
+
+
+## Public product detail (Phase 9)
+
+Catalog card names link to `/products/{slug}`. `ProductDetailController` uses
+`ProductService.getPublic` and a repository query requiring both the product and
+its own category to be active, matching catalog visibility. An unknown slug,
+inactive product, or inactive category returns HTTP 404. HTML clients see the
+friendly Persian 404 page; no product data or internal exception details are exposed.
+No database migration or dependency is required; V1–V6 remain unchanged.
+
+The page includes the product name/title, optional brand, formatted Toman price,
+stock/availability, category breadcrumb linking to the catalog, optional short/full
+plain-text descriptions, and populated board-game specifications. Text is escaped
+with Thymeleaf; descriptions preserve line breaks. Missing optional sections and
+null game fields are omitted. Short description supplies the meta description,
+falling back to the product name. Price always comes from the stored `Long` value.
+
+Images reuse the existing media service and `/media/{id}` routes. The first image
+by order/ID is primary. Small keyboard-accessible thumbnail links switch the primary
+image using a short script; without JavaScript they open the image directly.
+Missing files show placeholders, and products without images have no empty thumbnail
+controls. Mobile shows price/stock before the gallery; image height and thumbnail
+area are bounded so large galleries do not dominate the page.
+
+The quantity input has minimum 1, integer steps, and a maximum equal to current
+stock; it is disabled for unavailable products. **Add to Cart is disabled for all
+products**, with an explicit Persian message that online purchase is coming soon.
+There is intentionally no submitting form, fake success message, cart endpoint,
+cart service, session data, badge, or calculation. Phase 10 will add the actual
+server-validated cart operation; the current quantity control is only a UI boundary.
+Stock shown here is informational and is not reserved.
+
+Manual verification: open a catalog card, check price/stock/category links, choose
+images by mouse and keyboard, inspect no-image/missing-file fallback, and view
+populated/empty board-game specifications and multiline escaped descriptions.
+Confirm quantity limits, disabled cart control, unknown/inactive 404, and layouts
+at 360/768/1440px. Recheck admin login/category/product/media management plus catalog
+search/filter/pagination. Product Detail does not add related products, reviews,
+ratings, recommendations, or any Shopping Cart implementation.

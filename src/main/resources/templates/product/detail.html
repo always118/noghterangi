@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(${product.name}, ~{::content})}">
+<head><title>محصول</title></head>
+<body><article th:fragment="content" aria-labelledby="product-title" class="product-detail">
+    <script th:src="@{/js/product-gallery.js}" defer></script>
+    <nav aria-label="مسیر صفحه">
+        <ol class="breadcrumb small text-break">
+            <li class="breadcrumb-item"><a th:href="@{/}">خانه</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/products}">محصولات</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/products(category=${product.category.slug})}" th:text="${product.category.name}"></a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${product.name}"></li>
+        </ol>
+    </nav>
+    <h1 id="product-title" class="h2 text-break mb-4" th:text="${product.name}"></h1>
+    <div class="row g-4 mb-4">
+        <section class="col-md-6 order-md-2" aria-label="اطلاعات و موجودی محصول">
+            <p th:if="${!#strings.isEmpty(product.brand)}">برند: <span th:text="${product.brand}"></span></p>
+            <p id="product-price" class="h4 mb-3"><bdi th:text="${#numbers.formatInteger(product.price, 1, 'COMMA')}"></bdi> تومان</p>
+            <p id="product-availability" class="fw-bold" th:classappend="${product.stockQuantity > 0} ? 'text-success' : 'text-secondary'"
+               th:text="${product.stockQuantity > 0} ? 'موجود' : 'ناموجود'"></p>
+            <p th:if="${product.stockQuantity > 0}" class="small text-muted" th:text="'موجودی: ' + ${product.stockQuantity} + ' عدد'"></p>
+            <p th:if="${!#strings.isEmpty(product.shortDescription)}" class="product-description" th:text="${product.shortDescription}"></p>
+            <div class="border rounded p-3" aria-describedby="cart-help">
+                <label for="quantity" class="form-label">تعداد</label>
+                <input id="quantity" name="quantity" class="form-control quantity-input mb-3" type="number" min="1" step="1" value="1" required
+                       th:max="${product.stockQuantity > 0} ? ${product.stockQuantity} : 1" th:disabled="${product.stockQuantity <= 0}" aria-describedby="cart-help">
+                <button id="add-to-cart" class="btn btn-primary" type="button" disabled aria-describedby="cart-help">افزودن به سبد خرید</button>
+                <p id="cart-help" class="small text-muted mt-2 mb-0">خرید آنلاین به‌زودی فعال می‌شود؛ در حال حاضر امکان افزودن به سبد خرید وجود ندارد.</p>
+            </div>
+        </section>
+        <section class="col-md-6 order-md-1" aria-label="تصاویر محصول" data-product-gallery>
+            <div class="detail-main-image border rounded">
+                <span class="image-placeholder h-100" th:hidden="${!#lists.isEmpty(images)}">بدون تصویر</span>
+                <img th:if="${!#lists.isEmpty(images)}" id="primary-image" data-gallery-image th:src="@{/media/{id}(id=${images[0].id})}"
+                     th:alt="${product.name} + ' — تصویر ۱'" width="640" height="480">
+            </div>
+            <ul class="list-unstyled d-flex flex-wrap gap-2 mt-3 gallery-thumbnails" th:if="${#lists.size(images) > 1}" aria-label="انتخاب تصویر">
+                <li th:each="image, state : ${images}">
+                    <a class="gallery-thumbnail border rounded" data-gallery-thumbnail th:href="@{/media/{id}(id=${image.id})}"
+                       th:aria-label="'نمایش تصویر ' + ${state.count}" th:aria-current="${state.first} ? 'true' : 'false'">
+                        <span class="image-placeholder h-100 small" hidden>بدون تصویر</span>
+                        <img data-gallery-image th:src="@{/media/{id}(id=${image.id})}" th:alt="${product.name} + ' — تصویر ' + ${state.count}" width="80" height="60" loading="lazy">
+                    </a>
+                </li>
+            </ul>
+        </section>
+    </div>
+    <section th:if="${gameSpecifications}" class="mb-4" aria-labelledby="game-title" id="game-specifications">
+        <h2 id="game-title" class="h4">مشخصات بازی</h2>
+        <dl class="row g-2">
+            <th:block th:if="${product.minimumAge != null}"><dt class="col-6 col-md-3">حداقل سن</dt><dd class="col-6 col-md-9" th:text="${product.minimumAge} + ' سال'"></dd></th:block>
+            <th:block th:if="${product.maximumAge != null}"><dt class="col-6 col-md-3">حداکثر سن</dt><dd class="col-6 col-md-9" th:text="${product.maximumAge} + ' سال'"></dd></th:block>
+            <th:block th:if="${product.minimumPlayers != null}"><dt class="col-6 col-md-3">حداقل بازیکنان</dt><dd class="col-6 col-md-9" th:text="${product.minimumPlayers} + ' نفر'"></dd></th:block>
+            <th:block th:if="${product.maximumPlayers != null}"><dt class="col-6 col-md-3">حداکثر بازیکنان</dt><dd class="col-6 col-md-9" th:text="${product.maximumPlayers} + ' نفر'"></dd></th:block>
+            <th:block th:if="${product.playingTimeMinutes != null}"><dt class="col-6 col-md-3">مدت زمان بازی</dt><dd class="col-6 col-md-9" th:text="${product.playingTimeMinutes} + ' دقیقه'"></dd></th:block>
+        </dl>
+    </section>
+    <section th:if="${!#strings.isEmpty(product.description)}" aria-labelledby="description-title" class="mb-4">
+        <h2 id="description-title" class="h4">توضیحات محصول</h2>
+        <p class="product-description" th:text="${product.description}"></p>
+    </section>
+</article></body>
+</html>

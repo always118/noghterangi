@@ -18,6 +18,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Override
     @EntityGraph(attributePaths = "category")
     Optional<Product> findById(Long id);
+    @EntityGraph(attributePaths = "category")
+    Optional<Product> findBySlugAndActiveTrueAndCategoryActiveTrue(String slug);
     boolean existsBySlug(String slug);
     boolean existsBySlugAndIdNot(String slug, Long id);
     boolean existsBySku(String sku);

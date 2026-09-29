@@ -11,7 +11,7 @@
 | 6 | Products | DONE | V4 + Product admin + validation; 32 tests; browser CRUD/security + RTL 360/768/1440px; / and /health HTTP 200 |
 | 7 | Product Images | DONE | V5 + local JPEG/PNG storage + protected image management; 43 tests; packaged app/browser upload/order/removal/security + RTL 360/768/1440px; / and /health HTTP 200 |
 | 8 | Product Catalog | DONE | V6 normalization + PostgreSQL filters/sorts/pagination; 53 tests; Chromium catalog/admin regressions + RTL 360/768/1440px; /, /products, /health HTTP 200 |
-| 9 | Product Detail | NOT_STARTED | — |
+| 9 | Product Detail | DONE | Public slug detail + gallery + safe descriptions/specifications; 60 tests; Chromium keyboard/quantity/404 + RTL 360/768/1440px and admin/catalog regressions passed |
 | 10 | Shopping Cart | NOT_STARTED | — |
 | 11 | Checkout and Orders | NOT_STARTED | — |
 | 12 | Admin Orders | NOT_STARTED | — |

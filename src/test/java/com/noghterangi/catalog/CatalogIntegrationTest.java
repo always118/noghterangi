@@ -179,7 +179,8 @@ class CatalogIntegrationTest {
         var images = media.images(pictured.getId()); media.reorder(pictured.getId(), images.getFirst().getId(), 8);
         String body = browser.get("/products?category=" + root.getSlug()).body();
         assertThat(body).contains("/media/" + images.getLast().getId(), "بدون تصویر", "ناموجود", "ویژه", "data-catalog-image")
-                .doesNotContain("/media/" + images.getFirst().getId(), "/products/" + pictured.getSlug());
+                .doesNotContain("/media/" + images.getFirst().getId())
+                .contains("/products/" + pictured.getSlug());
         assertThat(browser.get("/media/" + images.getLast().getId()).statusCode()).isEqualTo(200);
         storage.delete(images.getLast().getStoredFileName());
         assertThat(browser.get("/media/" + images.getLast().getId()).statusCode()).isEqualTo(404);

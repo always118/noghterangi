@@ -8,7 +8,7 @@
     </div>
     <div class="card-body d-flex flex-column gap-2">
         <span class="badge text-bg-warning align-self-start" th:if="${product.featured}">ویژه</span>
-        <h2 class="h6 catalog-name" th:text="${product.name}" th:title="${product.name}"></h2>
+        <h2 class="h6 catalog-name" th:title="${product.name}"><a th:href="@{/products/{slug}(slug=${product.slug})}" th:text="${product.name}"></a></h2>
         <p class="mb-0 mt-auto catalog-price"><bdi th:text="${#numbers.formatInteger(product.price, 1, 'COMMA')}"></bdi> تومان</p>
         <span class="small" th:classappend="${product.stockQuantity > 0} ? 'text-success' : 'text-secondary'"
               th:text="${product.stockQuantity > 0} ? 'موجود' : 'ناموجود'"></span>

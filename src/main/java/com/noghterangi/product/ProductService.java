@@ -31,6 +31,11 @@ public class ProductService {
         return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "محصول پیدا نشد."));
     }
 
+    public Product getPublic(String slug) {
+        return repository.findBySlugAndActiveTrueAndCategoryActiveTrue(slug).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "محصول پیدا نشد."));
+    }
+
     public List<Category> categoryChoices(Long productId) {
         var choices = new ArrayList<>(categories.findByActiveTrueOrderByNameAscIdAsc());
         if (productId != null) {
