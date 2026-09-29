@@ -1,7 +1,7 @@
 # Noghte Rangi — نقطه رنگی
 
 A Persian local online shop built incrementally as a simple Spring Boot modular
-monolith. Current implementation: **Phase 6 — Products**, with protected category and product administration.
+monolith. Current implementation: **Phase 7 — Product Images**, with protected category, product, and image administration.
 
 ## Prerequisites
 
@@ -56,6 +56,7 @@ no fallback in application configuration.
 | `ADMIN_USERNAME` | Required single administrator username; no default |
 | `ADMIN_PASSWORD_HASH` | Required BCrypt hash (cost 10 or higher); no plaintext password |
 | `SESSION_COOKIE_SECURE` | Set `true` with HTTPS; default `false` supports local HTTP |
+| `MEDIA_STORAGE_PATH` | Local image directory; default `uploads/media` relative to working directory |
 | `SERVER_PORT` | Application HTTP port; Spring Boot defaults to `8080` |
 
 If you change a Compose host port, update the corresponding JDBC URL too.
@@ -139,8 +140,10 @@ constraint, a lowercase slug format check, and creation/update timestamps.
 `V3__add_category_parent.sql` adds the optional category parent.
 `V4__create_product.sql` adds products, integer Toman prices, slug/SKU uniqueness,
 category foreign key, and numeric/game-field checks. Hibernate validates both
-Category and Product mappings against PostgreSQL. Do not modify an
+Category, Product, and Media mappings against PostgreSQL. Do not modify an
 already applied migration; add a new version. Flyway clean is disabled.
+`V5__create_media.sql` adds ordered product image metadata, a unique generated
+filename, and a restrictive product foreign key. Product hard deletion remains unavailable.
 
 ## Manual verification
 
@@ -153,7 +156,7 @@ docker compose exec -T postgres psql -U noghterangi -d noghterangi -c 'SELECT ve
 docker compose exec -T postgres psql -U noghterangi -d noghterangi -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'noghterangi';"
 ```
 
-Expect HTTP 200 for both routes, migration versions `1` through `4` with `success = t`, and
+Expect HTTP 200 for both routes, migration versions `1` through `5` with `success = t`, and
 schema `noghterangi`. Restart the app: Flyway should report that it is up to date.
 The `/health` route remains a simple web liveness check, not a live database probe.
 
@@ -170,9 +173,9 @@ There is no application container yet; that belongs to Phase 15.
 
 Java code lives under `com.noghterangi`, with categories in the `category` feature
 package. Phase 5 Categories was completed early; Phase 4 now secures all admin routes.
-Phase 6 adds the Product domain and protected administration. Images, public catalog,
-cart, orders, customer accounts, and content are not implemented.
-Phase 7 Product Images requires explicit approval; no Git commit is made automatically.
+Phase 6 adds the Product domain and protected administration; Phase 7 adds local product images.
+Public catalog, cart, orders, customer accounts, and content are not implemented.
+Phase 8 Product Catalog requires explicit approval; no Git commit is made automatically.
 
 ## UI foundation (Phase 3)
 
@@ -327,8 +330,63 @@ Manual checks:
    ranges; expect clear Persian errors and no saved changes.
 5. Deactivate/reactivate a product. Check existing category create/edit/activation,
    optional parent selection, public active-category display, `/`, and `/health`.
-6. Check product list/form at 360px, 768px, and 1440px. Product images and public
-   catalog are intentionally deferred to their approved future phases.
+6. Check product list/form at 360px, 768px, and 1440px. Image management is described below; the public catalog remains deferred.
 
 Product integration tests use real PostgreSQL and authenticated HTTP requests with
 CSRF tokens, and clean up only their uniquely prefixed products/categories.
+
+
+## Product images (Phase 7)
+
+Save the product first, then choose **تصاویر** in the product list or **مدیریت تصاویر محصول**
+on its edit page. `/admin/products/{id}/images` supports multiple upload, numeric
+ordering, and removal. Save pending product edits before following that link.
+The first image ordered by `sortOrder`, then ID, is primary. Products without
+images show a text placeholder. No public catalog or product deletion is added.
+
+`Media` holds the product relationship, original filename metadata, generated
+filename, MIME type, byte size, order, and creation time. `MediaService` manages
+records; the small `MediaStorageService` interface isolates physical storage in
+`LocalMediaStorageService`. Product business services do not handle files.
+
+Configure `MEDIA_STORAGE_PATH` in your private `.env` and export it before startup.
+The default `uploads/media` is outside the classpath and ignored by Git. Use a
+persistent directory owned by the application account; do not make it writable
+by other users or serve it directly from a web server. Back up that directory and
+the database together. Keep the same working directory when using the relative default.
+
+Uploads accept JPEG (`.jpg`/`.jpeg`, `image/jpeg`) and PNG (`.png`, `image/png`),
+up to 5 MiB each, 10 files per batch, 10 million pixels, and 8192 pixels per side.
+The request limit is 55 MiB. The JDK decoder validates actual content and its match
+to MIME/extension before writing; no image processing dependencies are added.
+WebP and SVG are unsupported. Images are not resized, re-encoded, or stripped of
+metadata. Original basenames are escaped display metadata only. Generated UUID
+filenames, strict filename validation, and no-follow reads prevent path traversal.
+
+`GET /media/{id}` anonymously serves the matching file with its image content type;
+missing records or files return 404. Image URLs remain public even when their
+product is inactive. Admin upload/order/delete require the existing admin session
+and CSRF protection. The multipart form places the CSRF token in its action query
+to support multipart CSRF verification without an upload filter before security, following the
+[Spring Security multipart guidance](https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html#csrf-considerations-multipart).
+Avoid logging query strings for these upload routes. Other forms keep hidden CSRF fields.
+
+A failed upload batch rolls back its database records and cleans up new files.
+Removal commits the record deletion before deleting that generated file; missing
+files are harmless. Filesystem and database operations are not a distributed
+transaction: process crashes or filesystem cleanup failures can leave orphan
+files. Cleanup failures log the generated filename for manual reconciliation;
+there is no background cleanup job. Never remove files referenced by other records.
+
+Manual checks:
+
+1. Sign in, save a product, open its images page, and upload one JPEG and one PNG.
+2. Confirm both images display, then change order and check the product list's primary image.
+3. Submit SVG/disguised content and a file larger than 5 MiB; expect Persian errors and no saved upload.
+4. Remove one image and confirm the other remains. Remove the last image and check the placeholder.
+5. Check anonymous image retrieval, blocked anonymous admin mutations, and CSRF rejection.
+6. Check product/category edits and activation, `/`, `/health`, and RTL at 360/768/1440px.
+
+Tests use a temporary image directory, real PostgreSQL, and real HTTP multipart
+requests. They cover content/size/path checks, image ownership, ordering, retrieval,
+removal, rollback cleanup, authentication, and CSRF alongside existing regressions.

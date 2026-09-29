@@ -141,6 +141,11 @@
                 <a class="btn btn-outline-secondary" th:href="@{/admin/products}">بازگشت به فهرست</a>
             </div>
         </form>
+        <div class="mt-4" th:if="${productId != null}">
+            <a class="btn btn-outline-primary" th:href="@{/admin/products/{id}/images(id=${productId})}">مدیریت تصاویر محصول</a>
+            <p class="form-text">پیش از رفتن به تصاویر، تغییرات محصول را ذخیره کنید.</p>
+        </div>
+        <p class="form-text mt-3" th:if="${productId == null}">پس از ذخیره محصول، از فهرست محصولات تصاویر آن را مدیریت کنید.</p>
     </div></div>
 </section></body>
 </html>

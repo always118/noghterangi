@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('تصاویر محصول', ~{::content})}">
+<head><title>تصاویر محصول</title></head>
+<body><section th:fragment="content" aria-labelledby="page-title">
+    <nav th:replace="~{admin/navigation :: navigation}"></nav>
+    <h1 id="page-title" class="h3">تصاویر محصول: <span th:text="${product.name}"></span></h1>
+    <p>تصویر با کمترین ترتیب، تصویر اصلی است. در ترتیب برابر، تصویر قدیمی‌تر اول نمایش داده می‌شود.</p>
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a class="btn btn-outline-secondary" th:href="@{/admin/products/{id}/edit(id=${product.id})}">ویرایش محصول</a>
+        <a class="btn btn-outline-secondary" th:href="@{/admin/products}">فهرست محصولات</a>
+    </div>
+    <!-- Query token supports multipart CSRF verification without a pre-security upload filter. -->
+    <form class="border rounded p-3 mb-4" method="post" enctype="multipart/form-data"
+          th:action="@{/admin/products/{id}/images(id=${product.id},_csrf=${_csrf.token})}">
+        <label for="files" class="form-label">انتخاب تصاویر JPEG یا PNG</label>
+        <input class="form-control" id="files" name="files" type="file" multiple required
+               accept="image/jpeg,image/png,.jpg,.jpeg,.png" aria-describedby="upload-help">
+        <p class="form-text" id="upload-help">در هر بار ۱ تا ۱۰ تصویر؛ حداکثر ۵ مگابایت، ۱۰ میلیون پیکسل و ۸۱۹۲ پیکسل در هر ضلع. WebP و SVG پشتیبانی نمی‌شوند.</p>
+        <button type="submit" class="btn btn-primary">بارگذاری تصاویر</button>
+    </form>
+    <p th:if="${#lists.isEmpty(images)}" class="alert alert-info">این محصول هنوز تصویری ندارد.</p>
+    <ul class="list-unstyled row g-3">
+        <li class="col-12 col-md-6 col-xl-4" th:each="image, state : ${images}">
+            <article class="category-card border bg-white" th:attr="data-image-id=${image.id}">
+                <img class="product-image mb-3" th:src="@{/media/{id}(id=${image.id})}"
+                     th:alt="${product.name} + ' — ' + ${image.originalFileName}">
+                <span th:if="${state.first}" class="badge text-bg-success mb-2">تصویر اصلی</span>
+                <p><bdi th:text="${image.originalFileName}"></bdi></p>
+                <form class="mb-3" method="post" th:action="@{/admin/products/{p}/images/{i}/order(p=${product.id},i=${image.id})}">
+                    <label class="form-label" th:for="'order-' + ${image.id}">ترتیب تصویر</label>
+                    <input class="form-control mb-2" type="number" name="sortOrder" min="0" max="2147483647" step="1" required
+                           th:id="'order-' + ${image.id}" th:value="${image.sortOrder}">
+                    <button class="btn btn-outline-secondary" type="submit">ذخیره ترتیب</button>
+                </form>
+                <form method="post" th:action="@{/admin/products/{p}/images/{i}/delete(p=${product.id},i=${image.id})}">
+                    <button class="btn btn-outline-danger" type="submit" th:aria-label="'حذف ' + ${image.originalFileName}">حذف تصویر</button>
+                </form>
+            </article>
+        </li>
+    </ul>
+</section></body>
+</html>

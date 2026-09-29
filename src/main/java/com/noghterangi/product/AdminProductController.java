@@ -1,6 +1,7 @@
 package com.noghterangi.product;
 
 import jakarta.validation.Valid;
+import com.noghterangi.media.MediaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,11 +12,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/admin/products")
 public class AdminProductController {
     private final ProductService service;
-    public AdminProductController(ProductService service) { this.service = service; }
+    private final MediaService media;
+    public AdminProductController(ProductService service, MediaService media) { this.service = service; this.media = media; }
 
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("products", service.findAll());
+        var products = service.findAll();
+        model.addAttribute("products", products);
+        model.addAttribute("primaryImages", media.primaryImages(products.stream().map(Product::getId).toList()));
         return "admin/products/list";
     }
 

@@ -42,6 +42,23 @@ public class TestBrowser implements AutoCloseable {
         return post(path, values);
     }
 
+    public HttpResponse<String> upload(String path, String csrf, java.util.List<org.springframework.mock.web.MockMultipartFile> files) throws Exception {
+        String boundary = "image-test-" + java.util.UUID.randomUUID();
+        var body = new java.io.ByteArrayOutputStream();
+        for (var file : files) {
+            body.write(("--" + boundary + "\r\nContent-Disposition: form-data; name=\"files\"; filename=\""
+                    + file.getOriginalFilename() + "\"\r\nContent-Type: " + file.getContentType() + "\r\n\r\n")
+                    .getBytes(StandardCharsets.UTF_8));
+            body.write(file.getBytes()); body.write("\r\n".getBytes(StandardCharsets.UTF_8));
+        }
+        body.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+        String target = path + (csrf == null ? "" : "?_csrf=" + URLEncoder.encode(csrf, StandardCharsets.UTF_8));
+        var request = HttpRequest.newBuilder(URI.create(baseUrl + target)).timeout(Duration.ofSeconds(30))
+                .header("Accept", "text/html").header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())).build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
+
     public void login() throws Exception {
         var response = postWithCsrf("/admin/login", "/admin/login",
                 Map.of("username", AdminTestConfiguration.USERNAME, "password", AdminTestConfiguration.PASSWORD));

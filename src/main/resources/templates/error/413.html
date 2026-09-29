@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('خطای بارگذاری تصویر', ~{::content})}">
+<head><title>خطای بارگذاری تصویر</title></head>
+<body><section th:fragment="content" aria-labelledby="page-title">
+    <p class="alert alert-danger" role="alert">حجم تصویر بیش از حد مجاز است. هر تصویر حداکثر ۵ مگابایت و هر بار حداکثر ۱۰ تصویر باشد.</p>
+    <h1 id="page-title" class="h3">بارگذاری تصویر ناموفق بود</h1>
+    <p>تصاویر کوچک‌تر انتخاب کنید و دوباره از صفحه تصاویر محصول تلاش کنید.</p>
+    <a class="btn btn-outline-secondary" th:href="@{/admin/products}">فهرست محصولات</a>
+</section></body>
+</html>
