@@ -28,6 +28,17 @@
                           th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('description')}" aria-describedby="description-errors"></textarea>
                 <div id="description-errors" class="invalid-feedback" th:errors="*{description}"></div>
             </div>
+            <div class="mb-3">
+                <label for="parentId" class="form-label">دسته‌بندی والد (اختیاری)</label>
+                <select id="parentId" class="form-select" th:field="*{parentId}" th:errorclass="is-invalid"
+                        th:aria-invalid="${#fields.hasErrors('parentId')}" aria-describedby="parent-help parent-errors">
+                    <option value="">بدون والد (دسته اصلی)</option>
+                    <option th:each="parent : ${parentCategories}" th:if="${parent.id != categoryId}"
+                            th:value="${parent.id}" th:text="${parent.name}"></option>
+                </select>
+                <div id="parent-help" class="form-text">فقط دسته‌های اصلی می‌توانند والد باشند؛ حداکثر دو سطح.</div>
+                <div id="parent-errors" class="invalid-feedback" th:errors="*{parentId}"></div>
+            </div>
             <div class="form-check mb-4">
                 <input id="active" class="form-check-input" type="checkbox" th:field="*{active}">
                 <label for="active" class="form-check-label">فعال و قابل نمایش در صفحه اصلی و منو</label>

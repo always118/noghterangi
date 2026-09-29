@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('مدیریت محصولات', ~{::content})}">
+<head><title>مدیریت محصولات</title></head>
+<body><section th:fragment="content" aria-labelledby="page-title">
+    <nav th:replace="~{admin/navigation :: navigation}"></nav>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <h1 id="page-title" class="h3 mb-0">مدیریت محصولات</h1>
+        <a class="btn btn-primary" th:href="@{/admin/products/new}">محصول جدید</a>
+    </div>
+    <p class="text-muted">قیمت‌ها به تومان هستند. برای تغییر قیمت، موجودی و سایر مشخصات، محصول را ویرایش کنید.</p>
+    <p th:if="${#lists.isEmpty(products)}" class="alert alert-info">هنوز محصولی ایجاد نشده است.</p>
+    <ul class="list-unstyled row g-3" th:unless="${#lists.isEmpty(products)}">
+        <li class="col-12 col-md-6 col-xl-4" th:each="product : ${products}">
+            <article class="category-card bg-white border" th:attr="data-product-id=${product.id}">
+                <h2 class="h5" th:text="${product.name}"></h2>
+                <dl class="mb-3">
+                    <dt>کد کالا</dt><dd><bdi class="d-block" dir="ltr" th:text="${product.sku}"></bdi></dd>
+                    <dt>دسته‌بندی / نوع</dt><dd><span th:text="${product.category.name}"></span> / <span th:text="${product.type.label}"></span></dd>
+                    <dt>قیمت (تومان)</dt><dd th:text="${product.price}"></dd>
+                    <dt>موجودی</dt><dd th:text="${product.stockQuantity}"></dd>
+                    <dt>ترتیب نمایش</dt><dd th:text="${product.displayOrder}"></dd>
+                </dl>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge" th:classappend="${product.active} ? 'text-bg-success' : 'text-bg-secondary'"
+                          th:text="${product.active} ? 'فعال' : 'غیرفعال'"></span>
+                    <span class="badge text-bg-warning" th:if="${product.featured}">ویژه</span>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/products/{id}/edit(id=${product.id})}"
+                       th:aria-label="'ویرایش ' + ${product.name}">ویرایش</a>
+                    <form method="post" th:action="@{/admin/products/{id}/active(id=${product.id})}">
+                        <input type="hidden" name="active" th:value="${!product.active}">
+                        <button class="btn btn-outline-secondary" type="submit" th:text="${product.active} ? 'غیرفعال کردن' : 'فعال کردن'"
+                                th:aria-label="(${product.active} ? 'غیرفعال کردن ' : 'فعال کردن ') + ${product.name}"></button>
+                    </form>
+                </div>
+            </article>
+        </li>
+    </ul>
+</section></body>
+</html>

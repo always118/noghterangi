@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('محصول', ~{::content})}">
+<head><title>محصول</title></head>
+<body><section th:fragment="content" aria-labelledby="page-title">
+    <nav th:replace="~{admin/navigation :: navigation}"></nav>
+    <div class="row justify-content-center"><div class="col-xl-9">
+        <h1 id="page-title" class="h3 mb-4" th:text="${productId == null} ? 'محصول جدید' : 'ویرایش محصول'"></h1>
+        <p th:if="${#lists.isEmpty(categories)}" class="alert alert-info">ابتدا یک <a th:href="@{/admin/categories/new}">دسته‌بندی فعال</a> ایجاد کنید.</p>
+        <form method="post" th:object="${productForm}"
+              th:action="${productId == null} ? @{/admin/products} : @{/admin/products/{id}(id=${productId})}">
+            <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger" role="alert">
+                <p class="mb-1">لطفاً خطاهای زیر را اصلاح کنید.</p>
+                <ul class="mb-0"><li th:each="error : ${#fields.errors('*')}" th:text="${error}"></li></ul>
+            </div>
+            <fieldset class="mb-4"><legend class="h5">مشخصات محصول</legend>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">نام محصول (الزامی)</label>
+                        <input id="name" class="form-control" type="text" th:field="*{name}" maxlength="160" required
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('name')}" aria-describedby="name-errors">
+                        <div id="name-errors" class="invalid-feedback" th:errors="*{name}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="brand" class="form-label">برند</label>
+                        <input id="brand" class="form-control" type="text" th:field="*{brand}" maxlength="120"
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('brand')}" aria-describedby="brand-errors">
+                        <div id="brand-errors" class="invalid-feedback" th:errors="*{brand}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="slug" class="form-label">نامک (الزامی؛ مانند color-pencil)</label>
+                        <input id="slug" class="form-control" type="text" th:field="*{slug}" dir="ltr" maxlength="160" required
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('slug')}" aria-describedby="slug-errors">
+                        <div id="slug-errors" class="invalid-feedback" th:errors="*{slug}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="sku" class="form-label">کد کالا (الزامی)</label>
+                        <input id="sku" class="form-control" type="text" th:field="*{sku}" dir="ltr" maxlength="64" required
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('sku')}" aria-describedby="sku-errors">
+                        <div id="sku-errors" class="invalid-feedback" th:errors="*{sku}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="categoryId" class="form-label">دسته‌بندی (الزامی)</label>
+                        <select id="categoryId" class="form-select" th:field="*{categoryId}" required th:errorclass="is-invalid"
+                                th:aria-invalid="${#fields.hasErrors('categoryId')}" aria-describedby="categoryId-errors">
+                            <option value="">انتخاب دسته‌بندی</option>
+                            <option th:each="category : ${categories}" th:value="${category.id}"
+                                    th:text="${category.name} + (${category.active} ? '' : ' (غیرفعال؛ دسته فعلی)')"></option>
+                        </select>
+                        <div id="categoryId-errors" class="invalid-feedback" th:errors="*{categoryId}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="type" class="form-label">نوع محصول (الزامی)</label>
+                        <select id="type" class="form-select" th:field="*{type}" required th:errorclass="is-invalid"
+                                th:aria-invalid="${#fields.hasErrors('type')}" aria-describedby="type-errors">
+                            <option value="">انتخاب نوع محصول</option>
+                            <option th:each="productType : ${productTypes}" th:value="${productType}" th:text="${productType.label}"></option>
+                        </select>
+                        <div id="type-errors" class="invalid-feedback" th:errors="*{type}"></div>
+                    </div>
+                    <div class="col-12">
+                        <label for="shortDescription" class="form-label">توضیح کوتاه</label>
+                        <textarea id="shortDescription" class="form-control" th:field="*{shortDescription}" rows="2" maxlength="500"
+                                  th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('shortDescription')}" aria-describedby="shortDescription-errors"></textarea>
+                        <div id="shortDescription-errors" class="invalid-feedback" th:errors="*{shortDescription}"></div>
+                    </div>
+                    <div class="col-12">
+                        <label for="description" class="form-label">توضیحات</label>
+                        <textarea id="description" class="form-control" th:field="*{description}" rows="5" maxlength="10000"
+                                  th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('description')}" aria-describedby="description-errors"></textarea>
+                        <div id="description-errors" class="invalid-feedback" th:errors="*{description}"></div>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset class="mb-4"><legend class="h5">قیمت، موجودی و نمایش</legend>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="price" class="form-label">قیمت به تومان (الزامی)</label>
+                        <input id="price" class="form-control" type="number" th:field="*{price}" min="0" step="1" required
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('price')}" aria-describedby="price-errors">
+                        <div id="price-errors" class="invalid-feedback" th:errors="*{price}"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="stockQuantity" class="form-label">موجودی (الزامی)</label>
+                        <input id="stockQuantity" class="form-control" type="number" th:field="*{stockQuantity}" min="0" step="1" required
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('stockQuantity')}" aria-describedby="stockQuantity-errors">
+                        <div id="stockQuantity-errors" class="invalid-feedback" th:errors="*{stockQuantity}"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="displayOrder" class="form-label">ترتیب نمایش (الزامی)</label>
+                        <input id="displayOrder" class="form-control" type="number" th:field="*{displayOrder}" min="0" step="1" required
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('displayOrder')}" aria-describedby="displayOrder-errors">
+                        <div id="displayOrder-errors" class="invalid-feedback" th:errors="*{displayOrder}"></div>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-4 mt-3">
+                    <div class="form-check"><input id="active" class="form-check-input" type="checkbox" th:field="*{active}"><label for="active" class="form-check-label">فعال</label></div>
+                    <div class="form-check"><input id="featured" class="form-check-input" type="checkbox" th:field="*{featured}"><label for="featured" class="form-check-label">محصول ویژه</label></div>
+                </div>
+            </fieldset>
+            <fieldset class="mb-4" aria-describedby="board-game-help"><legend class="h5">مشخصات بازی رومیزی (اختیاری)</legend>
+                <p id="board-game-help" class="text-muted small">این مشخصات فقط برای نوع بازی رومیزی ذخیره می‌شوند. با تغییر نوع محصول، مشخصات بازی پاک می‌شوند.</p>
+                <div th:if="${#fields.hasErrors('ageRangeValid')}" class="text-danger" th:errors="*{ageRangeValid}"></div>
+                <div th:if="${#fields.hasErrors('playerRangeValid')}" class="text-danger" th:errors="*{playerRangeValid}"></div>
+                <div th:if="${#fields.hasErrors('playingTimeValid')}" class="text-danger" th:errors="*{playingTimeValid}"></div>
+                <div class="row g-3">
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="minimumAge" class="form-label">حداقل سن</label>
+                        <input id="minimumAge" class="form-control" type="number" th:field="*{minimumAge}" min="0" step="1"
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('minimumAge')}" aria-describedby="minimumAge-errors">
+                        <div id="minimumAge-errors" class="invalid-feedback" th:errors="*{minimumAge}"></div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="maximumAge" class="form-label">حداکثر سن</label>
+                        <input id="maximumAge" class="form-control" type="number" th:field="*{maximumAge}" min="0" step="1"
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('maximumAge')}" aria-describedby="maximumAge-errors">
+                        <div id="maximumAge-errors" class="invalid-feedback" th:errors="*{maximumAge}"></div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="minimumPlayers" class="form-label">حداقل بازیکنان</label>
+                        <input id="minimumPlayers" class="form-control" type="number" th:field="*{minimumPlayers}" min="1" step="1"
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('minimumPlayers')}" aria-describedby="minimumPlayers-errors">
+                        <div id="minimumPlayers-errors" class="invalid-feedback" th:errors="*{minimumPlayers}"></div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="maximumPlayers" class="form-label">حداکثر بازیکنان</label>
+                        <input id="maximumPlayers" class="form-control" type="number" th:field="*{maximumPlayers}" min="1" step="1"
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('maximumPlayers')}" aria-describedby="maximumPlayers-errors">
+                        <div id="maximumPlayers-errors" class="invalid-feedback" th:errors="*{maximumPlayers}"></div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="playingTimeMinutes" class="form-label">زمان بازی (دقیقه)</label>
+                        <input id="playingTimeMinutes" class="form-control" type="number" th:field="*{playingTimeMinutes}" min="1" step="1"
+                               th:errorclass="is-invalid" th:aria-invalid="${#fields.hasErrors('playingTimeMinutes')}" aria-describedby="playingTimeMinutes-errors">
+                        <div id="playingTimeMinutes-errors" class="invalid-feedback" th:errors="*{playingTimeMinutes}"></div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-primary" type="submit">ذخیره محصول</button>
+                <a class="btn btn-outline-secondary" th:href="@{/admin/products}">بازگشت به فهرست</a>
+            </div>
+        </form>
+    </div></div>
+</section></body>
+</html>

@@ -167,6 +167,48 @@ class CategoryIntegrationTest {
         assertThat(service.get(category.getId()).isActive()).isTrue();
     }
 
+    @Test
+    void supportsOptionalParentAndRejectsSelfParentCyclesAndThirdLevel() {
+        Category root = service.create(form("والد", prefix + "-root", true));
+        assertThat(root.getParent()).isNull();
+        CategoryForm childForm = form("فرزند", prefix + "-child", true);
+        childForm.setParentId(root.getId());
+        Category child = service.create(childForm);
+        assertThat(service.get(child.getId()).getParent().getId()).isEqualTo(root.getId());
+        childForm.setParentId(child.getId());
+        assertThatThrownBy(() -> service.update(child.getId(), childForm)).isInstanceOf(InvalidCategoryParentException.class);
+        CategoryForm invalid = form("نامعتبر", prefix + "-invalid", true);
+        invalid.setParentId(child.getId());
+        assertThatThrownBy(() -> service.create(invalid)).isInstanceOf(InvalidCategoryParentException.class);
+        CategoryForm rootForm = form("والد", root.getSlug(), true);
+        rootForm.setParentId(child.getId());
+        assertThatThrownBy(() -> service.update(root.getId(), rootForm)).isInstanceOf(InvalidCategoryParentException.class);
+        Category otherRoot = service.create(form("والد دیگر", prefix + "-other-root", true));
+        rootForm.setParentId(otherRoot.getId());
+        assertThatThrownBy(() -> service.update(root.getId(), rootForm)).isInstanceOf(InvalidCategoryParentException.class);
+        childForm.setParentId(null);
+        service.update(child.getId(), childForm);
+        assertThat(service.get(child.getId()).getParent()).isNull();
+        invalid.setParentId(Long.MAX_VALUE);
+        assertThatThrownBy(() -> service.create(invalid)).isInstanceOf(InvalidCategoryParentException.class);
+    }
+
+    @Test
+    void adminBindsOptionalParentAndShowsClearInvalidParentError() throws Exception {
+        browser.login();
+        Category root = service.create(form("دسته اصلی", prefix + "-root", true));
+        assertThat(post("/admin/categories", Map.of("name", "زیرگروه", "slug", prefix + "-child",
+                "parentId", root.getId().toString(), "active", "true")).statusCode()).isEqualTo(302);
+        Category child = repository.findAll().stream().filter(c -> c.getSlug().equals(prefix + "-child")).findFirst().orElseThrow();
+        assertThat(service.get(child.getId()).getParent().getId()).isEqualTo(root.getId());
+        assertThat(get("/admin/categories/" + child.getId() + "/edit").body()).contains("دسته اصلی", "selected=\"selected\"");
+        var rejected = post("/admin/categories/" + child.getId(), Map.of("name", "زیرگروه", "slug", child.getSlug(),
+                "parentId", child.getId().toString()));
+        assertThat(rejected.statusCode()).isEqualTo(200);
+        assertThat(rejected.body()).contains("دسته‌بندی نمی‌تواند والد خودش باشد.");
+        assertThat(post("/admin/categories/" + child.getId(), Map.of("name", "زیرگروه", "slug", child.getSlug(), "parentId", "")).statusCode()).isEqualTo(302);
+    }
+
     private CategoryForm form(String name, String slug, boolean active) {
         CategoryForm form = new CategoryForm();
         form.setName(name);

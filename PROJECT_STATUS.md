@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 4 — Admin Security
+Phase 6 — Products
 
 Status: DONE
 
@@ -14,6 +14,7 @@ Status: DONE
 - Phase 3 — Base UI, RTL and Design System
 - Phase 4 — Admin Security
 - Phase 5 — Categories
+- Phase 6 — Products
 
 Note:
 Phase 5 Categories was implemented before Phase 4 because the project
@@ -22,13 +23,14 @@ Admin Security now protects the existing category routes and future admin routes
 
 ## Current Work
 
-Admin Security complete: Persian form login, BCrypt environment credentials,
-HTTP sessions, protected /admin/**, CSRF-protected category forms, and logout.
-Awaiting explicit approval for Phase 6.
+Phase 6 complete: Product domain and protected admin list/create/edit/activation,
+integer Toman prices, stock, featured/order settings, and board-game validation.
+Category compatibility correction completed in V3 before Phase 6 began.
+Awaiting explicit approval for Phase 7.
 
 ## Next Phase
 
-Phase 6 — Products (NOT_STARTED; explicit approval required)
+Phase 7 — Product Images (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
@@ -44,7 +46,8 @@ Phase 6 — Products (NOT_STARTED; explicit approval required)
 - Docker Compose for PostgreSQL
 - reusable Thymeleaf fragments
 - Noghte Rangi RTL design system
-- Category domain and admin management
+- Category domain and admin management with optional two-level parent
+- Product domain and protected admin management
 - active category display on public homepage
 
 ## Important Technical Decisions
@@ -57,7 +60,7 @@ Phase 6 — Products (NOT_STARTED; explicit approval required)
 - No SPA frontend
 - PostgreSQL
 - Flyway-managed schema
-- Prices will use Long and Toman
+- Prices use Long / BIGINT in whole Toman
 - Session-based shopping cart
 - Guest checkout
 - Manual card-to-card payment
@@ -75,15 +78,16 @@ Phase 6 — Products (NOT_STARTED; explicit approval required)
 
 ## Last Verification
 
-- Build: `mvn clean verify` PASSED using Java 21.
-- Tests: 20 passed, 0 failures/errors/skipped; security and category regressions.
-- Startup: packaged application passed; missing credentials correctly refuse startup.
-- PostgreSQL/Flyway/Hibernate: passed; V1/V2 unchanged; no security migration/table.
-- Anonymous /, /health, login, and static resources: HTTP 200.
-- Anonymous /admin and category admin pages: redirect to login.
-- Valid/invalid login, session rotation, authenticated category CRUD, and CSRF: passed.
-- Logout clears access; replay of the invalidated session remains blocked.
-- Public active-category display and RTL: passed; Chromium 360/768/1440px checked.
+- Category audit: missing parent corrected with V3; 22 tests passed before Phase 6.
+- Build: `mvn clean verify` PASSED on Java 21; 32 tests, 0 failures/errors/skipped.
+- Runtime: packaged application started; PostgreSQL connectivity and Hibernate validation passed.
+- Flyway: V1–V4 applied successfully; original V1/V2 unchanged. Only category/product business tables.
+- Product: authenticated create/edit/activation, price/stock updates, featured/order,
+  unique slug/SKU, category selection, and board-game validation passed.
+- Regression: Category parent/admin operations, public active categories, security/CSRF,
+  anonymous / and /health HTTP 200; anonymous product admin redirected to login.
+- UI: Chromium 360/768/1440px passed; mobile form and desktop list screenshots reviewed.
+- Temporary runtime data/credentials removed; verification server stopped.
 
 ## Last Updated
 

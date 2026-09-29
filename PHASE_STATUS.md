@@ -7,8 +7,8 @@
 | 2 | PostgreSQL and Flyway | DONE | DB + JPA + Flyway + tests passed |
 | 3 | Base UI, RTL and Design System | DONE | RTL + Bootstrap + fragments; Chromium 360/768/1440px; mvn clean verify (4 tests); / and /health HTTP 200 |
 | 4 | Admin Security | DONE | Spring Security + BCrypt + sessions + CSRF; 20 tests; browser login/logout + category regression passed |
-| 5 | Categories | DONE | Category migration + admin CRUD + active public categories; 13 tests; responsive verification; / and /health HTTP 200 |
-| 6 | Products | NOT_STARTED | — |
+| 5 | Categories | DONE | Optional parent corrected in V3; two-level validation + admin forms; 22 tests passed |
+| 6 | Products | DONE | V4 + Product admin + validation; 32 tests; browser CRUD/security + RTL 360/768/1440px; / and /health HTTP 200 |
 | 7 | Product Images | NOT_STARTED | — |
 | 8 | Product Catalog | NOT_STARTED | — |
 | 9 | Product Detail | NOT_STARTED | — |

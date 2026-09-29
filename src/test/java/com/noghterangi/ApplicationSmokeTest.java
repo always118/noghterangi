@@ -57,7 +57,7 @@ class ApplicationSmokeTest {
         flyway.validate();
         assertThat(flyway.info().applied())
                 .extracting(migration -> migration.getScript())
-                .contains("V1__create_application_schema.sql", "V2__create_category.sql");
+                .contains("V1__create_application_schema.sql", "V2__create_category.sql", "V3__add_category_parent.sql", "V4__create_product.sql");
         assertThat(flyway.info().pending()).isEmpty();
         assertThat(flyway.migrate().migrationsExecuted).isZero();
     }

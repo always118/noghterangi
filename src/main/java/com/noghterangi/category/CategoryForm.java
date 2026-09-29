@@ -1,6 +1,7 @@
 package com.noghterangi.category;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.Locale;
@@ -16,6 +17,8 @@ public class CategoryForm {
     @Size(max = 2000, message = "توضیحات باید حداکثر ۲۰۰۰ نویسه باشد.")
     private String description;
     private boolean active = true;
+    @Positive(message = "دسته‌بندی والد معتبر انتخاب کنید.")
+    private Long parentId;
 
     public static CategoryForm from(Category category) {
         CategoryForm form = new CategoryForm();
@@ -23,8 +26,12 @@ public class CategoryForm {
         form.setSlug(category.getSlug());
         form.setDescription(category.getDescription());
         form.setActive(category.isActive());
+        form.setParentId(category.getParent() == null ? null : category.getParent().getId());
         return form;
     }
+
+    public Long getParentId() { return parentId; }
+    public void setParentId(Long parentId) { this.parentId = parentId; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name == null ? null : name.strip(); }

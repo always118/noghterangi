@@ -14,6 +14,9 @@ public class AdminCategoryController {
 
     public AdminCategoryController(CategoryService service) { this.service = service; }
 
+    @ModelAttribute("parentCategories")
+    public java.util.List<Category> parentCategories() { return service.findRoots(); }
+
     @GetMapping
     public String list(Model model) {
         model.addAttribute("categories", service.findAll());
@@ -39,6 +42,9 @@ public class AdminCategoryController {
         if (errors.hasErrors()) { return "admin/categories/form"; }
         try {
             service.create(categoryForm);
+        } catch (InvalidCategoryParentException exception) {
+            errors.rejectValue("parentId", "invalid", exception.getMessage());
+            return "admin/categories/form";
         } catch (DuplicateCategorySlugException exception) {
             errors.rejectValue("slug", "duplicate", exception.getMessage());
             return "admin/categories/form";
@@ -55,6 +61,9 @@ public class AdminCategoryController {
         if (errors.hasErrors()) { return "admin/categories/form"; }
         try {
             service.update(id, categoryForm);
+        } catch (InvalidCategoryParentException exception) {
+            errors.rejectValue("parentId", "invalid", exception.getMessage());
+            return "admin/categories/form";
         } catch (DuplicateCategorySlugException exception) {
             errors.rejectValue("slug", "duplicate", exception.getMessage());
             return "admin/categories/form";

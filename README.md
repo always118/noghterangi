@@ -1,7 +1,7 @@
 # Noghte Rangi — نقطه رنگی
 
 A Persian local online shop built incrementally as a simple Spring Boot modular
-monolith. Current implementation: **Phase 4 — Admin Security**, with **Phase 5 — Categories** already implemented.
+monolith. Current implementation: **Phase 6 — Products**, with protected category and product administration.
 
 ## Prerequisites
 
@@ -136,7 +136,10 @@ in View is disabled. SQL script initialization is disabled; Flyway owns DDL.
 
 `V2__create_category.sql` adds `noghterangi.category`, including a unique slug
 constraint, a lowercase slug format check, and creation/update timestamps.
-Hibernate validates the Category mapping against PostgreSQL. Do not modify an
+`V3__add_category_parent.sql` adds the optional category parent.
+`V4__create_product.sql` adds products, integer Toman prices, slug/SKU uniqueness,
+category foreign key, and numeric/game-field checks. Hibernate validates both
+Category and Product mappings against PostgreSQL. Do not modify an
 already applied migration; add a new version. Flyway clean is disabled.
 
 ## Manual verification
@@ -150,7 +153,7 @@ docker compose exec -T postgres psql -U noghterangi -d noghterangi -c 'SELECT ve
 docker compose exec -T postgres psql -U noghterangi -d noghterangi -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'noghterangi';"
 ```
 
-Expect HTTP 200 for both routes, migration versions `1` and `2` with `success = t`, and
+Expect HTTP 200 for both routes, migration versions `1` through `4` with `success = t`, and
 schema `noghterangi`. Restart the app: Flyway should report that it is up to date.
 The `/health` route remains a simple web liveness check, not a live database probe.
 
@@ -167,8 +170,9 @@ There is no application container yet; that belongs to Phase 15.
 
 Java code lives under `com.noghterangi`, with categories in the `category` feature
 package. Phase 5 Categories was completed early; Phase 4 now secures all admin routes.
-Products, cart, orders, customer accounts, and content are not implemented.
-Phase 6 Products requires explicit approval; no Git commit is made automatically.
+Phase 6 adds the Product domain and protected administration. Images, public catalog,
+cart, orders, customer accounts, and content are not implemented.
+Phase 7 Product Images requires explicit approval; no Git commit is made automatically.
 
 ## UI foundation (Phase 3)
 
@@ -221,11 +225,20 @@ Manual checks:
 4. Deactivate it; confirm it remains in the admin list but disappears from both
    public cards and navigation. Activate it again and confirm it returns.
 5. Check the admin list/form and homepage at mobile and desktop widths.
-6. Confirm `/health` returns HTTP 200 and both Flyway migrations have succeeded.
+6. Confirm `/health` returns HTTP 200 and all Flyway migrations have succeeded.
 
 Category integration tests use the isolated test database and remove only their
 own uniquely prefixed records. They exercise service validation, PostgreSQL
 constraints, timestamps, public visibility, HTML escaping, and real HTTP admin flows.
+
+### Category parent compatibility correction
+
+A category may have no parent (a root) or one root parent. The admin form offers
+root categories; self-parenting, selecting a child as parent, and moving a category
+that already has children under another root are rejected. This keeps two practical
+levels without recursive tree management. Removing a parent returns the category
+to the root level. Each category's active flag remains independent; public display
+continues to filter by that category's own active flag.
 
 ## Admin security (Phase 4)
 
@@ -278,3 +291,44 @@ Verification:
 Tests generate isolated, temporary administrator credentials at runtime and use
 real HTTP sessions and form CSRF tokens. They do not read production admin secrets
 or disable authentication/CSRF. No real admin credentials are stored in test files.
+
+## Products (Phase 6)
+
+After signing in, open `/admin/products` for all products in display-order/ID order,
+`/admin/products/new` to create one, and `/admin/products/{id}/edit` to edit it.
+The same form manages name, slug, SKU, brand, descriptions, category, product type,
+price, stock, active/featured flags, and display order. Activation uses POST;
+there is no hard-delete action. Product types and categories are separate concepts.
+
+Prices are whole Toman stored as Java `Long` / PostgreSQL `BIGINT`, not fractional
+or floating-point amounts. Price, stock, and display order must be nonnegative.
+Slugs are trimmed and lowercase; SKUs are trimmed and uppercase. Both are unique
+across active and inactive products. Name/slug allow 160 characters, SKU 64,
+brand 120, short description 500, and description 10000.
+
+New category assignments require an active category. If a product's existing
+category is later deactivated, editing may retain that category; it is explicitly
+labeled inactive in the selector. A missing category is rejected with a form error.
+There is no automatic activation/deactivation inheritance.
+
+Types: STATIONERY, EDUCATIONAL, BOARD_GAME, BOOK, OTHER. For BOARD_GAME, age,
+player-count ranges, and playing time are nullable. Supplied ages must be
+nonnegative, player counts/time positive, and maxima at least their minima.
+Changing away from BOARD_GAME clears those five fields. They remain visible in
+the form with explanatory text; no dynamic attributes or custom JavaScript is used.
+
+Manual checks:
+
+1. Anonymous `/admin/products` must redirect to login; sign in and open the list.
+2. Create a product with an active category and whole Toman price; verify its
+   name, SKU, category, type, price, stock, and state in the list.
+3. Edit price, stock, featured state, and order; verify persistence after reload.
+4. Submit duplicate slug and SKU, negative price/stock, or invalid board-game
+   ranges; expect clear Persian errors and no saved changes.
+5. Deactivate/reactivate a product. Check existing category create/edit/activation,
+   optional parent selection, public active-category display, `/`, and `/health`.
+6. Check product list/form at 360px, 768px, and 1440px. Product images and public
+   catalog are intentionally deferred to their approved future phases.
+
+Product integration tests use real PostgreSQL and authenticated HTTP requests with
+CSRF tokens, and clean up only their uniquely prefixed products/categories.

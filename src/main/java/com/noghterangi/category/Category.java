@@ -17,6 +17,9 @@ public class Category {
     private String description;
     @Column(nullable = false)
     private boolean active;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Category parent;
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
     @Column(nullable = false)
@@ -30,6 +33,9 @@ public class Category {
         description = form.getDescription();
         active = form.isActive();
     }
+
+    void setParent(Category parent) { this.parent = parent; }
+    public Category getParent() { return parent; }
 
     void setActive(boolean active) { this.active = active; }
 
