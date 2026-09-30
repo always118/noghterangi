@@ -76,6 +76,11 @@ public class Product {
         stockQuantity -= quantity;
     }
 
+    public void restoreStock(int quantity) {
+        if (quantity < 1) { throw new IllegalArgumentException("Invalid stock restoration"); }
+        stockQuantity = Math.addExact(stockQuantity, quantity);
+    }
+
     void setActive(boolean active) { this.active = active; }
     @PrePersist
     void onCreate() { createdAt = updatedAt = Instant.now(); }

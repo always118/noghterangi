@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 11 — Checkout and Orders
+Phase 12 — Admin Orders
 
 Status: DONE
 
@@ -20,6 +20,7 @@ Status: DONE
 - Phase 9 — Product Detail
 - Phase 10 — Shopping Cart
 - Phase 11 — Checkout and Orders
+- Phase 12 — Admin Orders
 
 Note:
 Phase 5 Categories was implemented before Phase 4 because the project
@@ -28,13 +29,13 @@ Admin Security now protects the existing category routes and future admin routes
 
 ## Current Work
 
-Phase 11 complete: guest checkout, persistent orders and item snapshots, transactional
-stock reduction, and configured card-to-card confirmation. All required verification passed.
-Phase 12 awaits explicit approval.
+Phase 12 complete: protected paginated order list/detail, explicit status transitions,
+and transactional cancellation with exactly-once stock restoration. All required checks passed.
+Phase 13 awaits explicit approval.
 
 ## Next Phase
 
-Phase 12 — Admin Orders (NOT_STARTED; explicit approval required)
+Phase 13 — Real Homepage (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
@@ -59,6 +60,7 @@ Phase 12 — Admin Orders (NOT_STARTED; explicit approval required)
 - Anonymous HTTP-session cart with product-detail add, quantity controls, subtotal, and navigation badge
 - Guest checkout and persistent orders with historical name/price snapshots (Flyway V7)
 - Session-restricted order confirmation and environment-configured card-to-card instructions
+- Protected admin order list/detail, status filter, 20-row pagination, and explicit fulfillment/cancellation actions
 
 ## Important Technical Decisions
 
@@ -96,8 +98,15 @@ Phase 12 — Admin Orders (NOT_STARTED; explicit approval required)
 - Session expiry or invalidation loses the cart and access to confirmation, but persisted orders remain.
 - Checkout requires STORE_PAYMENT_CARD_NUMBER, STORE_PAYMENT_ACCOUNT_NAME, and STORE_PAYMENT_INSTRUCTIONS.
 - Checkout revalidates current products/prices, locks product rows in ID order, and commits order/items/stock together.
-- Stock decreases when the order is created, including unpaid orders; no timers, automatic cancellation, or restocking yet.
-- New orders start WAITING_FOR_PAYMENT. Payment verification and admin order management are not implemented.
+- Stock decreases when the order is created, including unpaid orders; no timers or automatic cancellation.
+- Admin flow: WAITING_FOR_PAYMENT → PAID → PREPARING → READY → DELIVERED; cancellation is allowed before delivery.
+- DELIVERED and CANCELLED are terminal. Other fulfillment changes never alter stock.
+- Cancellation locks the order and then products in ID order, atomically restoring ordered quantities once.
+- Repeated/concurrent cancellation cannot restock twice; missing products or integer overflow reject the whole cancellation.
+- Missing-product/overflow cases require manual investigation; no partial cancellation or inventory override exists.
+- Admin order pages use no-store caching and escaped snapshot/customer text. New status-failure logging excludes customer data.
+- New orders start WAITING_FOR_PAYMENT. Admin status changes are manual; no payment verification automation or refunds.
+- Customer confirmation shows card instructions only while WAITING_FOR_PAYMENT.
 - Item product IDs have no product FK; name/price snapshots survive later product deletion.
 - Public order numbers combine UTC date and random UUID-derived groups; a unique database constraint enforces uniqueness.
 - Order totals use whole Toman and exclude shipping charges. No gateway, receipt upload, or customer accounts.
@@ -105,31 +114,29 @@ Phase 12 — Admin Orders (NOT_STARTED; explicit approval required)
 
 ## Last Verification
 
-- Java 21 `mvn clean verify` PASSED: 77 tests, 0 failures/errors/skipped (2026-09-29).
-- Ten checkout integration tests cover required fields/lengths/mobile normalization, empty carts,
-  server-side current prices, name/price snapshots after product changes/deletion, totals/status/numbers,
-  inactive category/product, zero/insufficient stock, missing product, overflow, and payment configuration.
-- Real PostgreSQL item-insert failure rolled back order/items/stock and retained the session cart.
-  Multi-item failure rolled back earlier stock changes; concurrent checkouts did not oversell;
-  simultaneous same-session submissions produced only one order. CSRF/admin/session privacy checks passed.
-- Packaged app started against PostgreSQL; new Flyway V7 migration and Hibernate ddl-auto=validate passed.
-  Previous migrations were unchanged. No new dependencies or security-rule changes.
-- Anonymous home, health, catalog, detail, cart, and populated checkout worked; empty checkout redirected safely.
-- Chromium completed Home/Product/Cart/Checkout/Confirmation with Persian delivery data and configured test
-  card instructions. Order number, WAITING_FOR_PAYMENT status, 90,000 Toman current-price total, cleared cart,
-  persisted order/item values (45,000 × 2), and stock reduction (3 to 1) were verified against PostgreSQL.
-- Browser failure cases passed: invalid customer input, stock reduced after opening checkout, zero stock,
-  inactive product, and product deleted after opening checkout. Failed attempts retained the cart.
-- Price changed after opening checkout was used at submission; later name/price edits did not alter snapshots.
-  Another session could not access confirmation. Checkout POST without CSRF returned 403.
-- Checkout and confirmation fit 360/768/1440px without horizontal overflow; RTL, touch-friendly fields,
-  readable summaries/payment instructions, and all six screenshots were visually reviewed on 2026-09-30.
-- Existing browser regressions passed: admin login/logout; category/product create/edit/activation;
-  image upload/order/remove/fallback; catalog search/filter/sort/pagination; detail/gallery/keyboard;
-  complete shopping-cart lifecycle, live changes, badges/totals, and no-JavaScript cart operation.
-- Temporary order/item, 20 products (one deleted in the failure test), four categories, images, credentials,
-  and isolated image storage removed; verification server stopped on 2026-09-30.
-- Phase 11 DONE. Phase 12 remains NOT_STARTED. No automatic commit.
+- Java 21 `mvn clean verify` PASSED: 87 tests, 0 failures/errors/skipped (2026-09-30).
+- Ten admin-order integration tests cover anonymous blocking, admin access, CSRF, newest-first ordering,
+  20-row database paging, status filtering/paging links, malformed input/missing orders, historical snapshots,
+  escaped customer data, allowed/invalid transitions, all pre-delivery cancellation states, and terminal states.
+- Exact quantities restored across multiple products, including inactive products. Repeated and concurrent
+  cancellation restored stock once. Missing product, integer overflow, and forced PostgreSQL status-update
+  failure rolled back all status/stock changes. Cancelled confirmation no longer requests payment.
+- Packaged app started against PostgreSQL; Flyway V1–V7 validation and Hibernate ddl-auto=validate passed.
+  No migration, dependency, or security-rule changes were required.
+- Anonymous admin list/detail were blocked; authenticated list/detail/filter/paging worked. CSRF-less status
+  POST returned 403; invalid/repeated transitions and missing orders produced Persian messages.
+- Chromium exercised WAITING_FOR_PAYMENT → PAID → PREPARING → READY → DELIVERED; PostgreSQL confirmed
+  stock stayed unchanged. Separate cancellation restored stock 47 → 50 for three units; retry remained 50.
+  Cancelled orders could not return to fulfillment; delivered orders could not move backward.
+- Twenty-three real checkout orders verified newest-first listing, 20/3 pagination, waiting-status 20/1 paging,
+  cancelled filtering, current status labels, persisted totals, and historical snapshot display.
+- Admin order list/detail fit 360/768/1440px without horizontal overflow; RTL and all six screenshots reviewed.
+- Browser regressions passed: homepage/health, catalog search/filter/sort/pagination, product detail/gallery,
+  complete cart lifecycle and no-JavaScript cart operation, checkout success/failure/current-price snapshots,
+  order creation, session privacy, admin login/logout, category/product management, and image management.
+- Temporary 23 orders/items, 20 products (one deleted during failure verification), four categories, images,
+  credentials, and isolated image storage removed; verification server stopped.
+- Phase 12 DONE. Phase 13 remains NOT_STARTED. No automatic commit.
 
 ## Last Updated
 

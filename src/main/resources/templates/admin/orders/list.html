@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('مدیریت سفارش‌ها', ~{::content})}">
+<head><title>مدیریت سفارش‌ها</title></head>
+<body><section th:fragment="content" aria-labelledby="page-title">
+    <nav th:replace="~{admin/navigation :: navigation}"></nav>
+    <h1 id="page-title" class="h3 mb-4">مدیریت سفارش‌ها</h1>
+    <form th:action="@{/admin/orders}" method="get" class="row g-3 align-items-end mb-4">
+        <div class="col-12 col-sm-7 col-lg-4">
+            <label for="status-filter" class="form-label">وضعیت سفارش</label>
+            <select id="status-filter" name="status" class="form-select py-2">
+                <option value="">همه وضعیت‌ها</option>
+                <option th:each="status : ${statuses}" th:value="${status}" th:text="${status.label}" th:selected="${status.name() == statusFilter}"></option>
+            </select>
+        </div>
+        <div class="col-auto"><button class="btn btn-primary" type="submit">اعمال فیلتر</button></div>
+    </form>
+    <p class="small text-muted">جدیدترین سفارش‌ها ابتدا نمایش داده می‌شوند. زمان‌ها به وقت تهران هستند.</p>
+    <p th:if="${orders.empty}" class="alert alert-info">سفارشی برای نمایش پیدا نشد.</p>
+    <ul class="list-unstyled row g-3">
+        <li class="col-12 col-md-6 col-xl-4" th:each="order : ${orders.content}">
+            <article class="border rounded bg-white p-3 h-100 text-break" th:attr="data-order-id=${order.id}">
+                <h2 class="h6"><a th:href="@{/admin/orders/{id}(id=${order.id})}"><bdi th:text="${order.orderNumber}"></bdi></a></h2>
+                <dl class="mb-0">
+                    <dt>نام مشتری</dt><dd th:text="${order.customerName}"></dd>
+                    <dt>موبایل</dt><dd><bdi th:text="${order.phone}"></bdi></dd>
+                    <dt>مبلغ (تومان)</dt><dd th:text="${#numbers.formatInteger(order.totalAmount, 1, 'COMMA')}"></dd>
+                    <dt>وضعیت</dt><dd th:text="${order.status.label}"></dd>
+                    <dt>زمان ثبت</dt><dd><bdi th:text="${#temporals.format(order.createdAt.atZone(T(java.time.ZoneId).of('Asia/Tehran')), 'yyyy/MM/dd HH:mm')}"></bdi></dd>
+                </dl>
+                <a class="btn btn-outline-primary mt-2" th:href="@{/admin/orders/{id}(id=${order.id})}" th:aria-label="'جزئیات سفارش ' + ${order.orderNumber}">جزئیات سفارش</a>
+            </article>
+        </li>
+    </ul>
+    <nav th:if="${orders.totalPages > 1}" class="d-flex flex-wrap align-items-center gap-3 mt-4" aria-label="صفحه‌بندی سفارش‌ها">
+        <a th:if="${orders.hasPrevious()}" class="btn btn-outline-secondary" th:href="@{/admin/orders(status=${statusFilter},page=${orders.number - 1})}">قبلی</a>
+        <span th:text="'صفحه ' + ${orders.number + 1} + ' از ' + ${orders.totalPages}"></span>
+        <a th:if="${orders.hasNext()}" class="btn btn-outline-secondary" th:href="@{/admin/orders(status=${statusFilter},page=${orders.number + 1})}">بعدی</a>
+    </nav>
+</section></body></html>

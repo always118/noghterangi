@@ -3,6 +3,13 @@ package com.noghterangi.order;
 import com.noghterangi.product.ProductRepository;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import java.util.Comparator;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -45,6 +52,55 @@ public class OrderService {
             product.decreaseStock(quantity);
         }
         return orders.saveAndFlush(order);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Order> list(OrderStatus status, int page) {
+        var pageable = PageRequest.of(page, 20,
+                Sort.by(Sort.Direction.DESC, "createdAt", "id"));
+        return status == null ? orders.findAll(pageable) : orders.findByStatus(status, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Order get(Long id) { return orders.findById(id).orElseThrow(this::missingOrder); }
+
+    public List<OrderStatus> allowedTransitions(OrderStatus current) {
+        return switch (current) {
+            case WAITING_FOR_PAYMENT -> List.of(OrderStatus.PAID, OrderStatus.CANCELLED);
+            case PAID -> List.of(OrderStatus.PREPARING, OrderStatus.CANCELLED);
+            case PREPARING -> List.of(OrderStatus.READY, OrderStatus.CANCELLED);
+            case READY -> List.of(OrderStatus.DELIVERED, OrderStatus.CANCELLED);
+            case DELIVERED, CANCELLED -> List.of();
+        };
+    }
+
+    @Transactional
+    public void changeStatus(Long id, OrderStatus next) {
+        // This lock serializes updates across sessions and application instances.
+        Order order = orders.findForStatusChange(id).orElseThrow(this::missingOrder);
+        if (next == null || !allowedTransitions(order.getStatus()).contains(next)) {
+            throw new OrderStatusException(order.getStatus() == OrderStatus.CANCELLED
+                    ? "این سفارش قبلاً لغو شده است؛ موجودی دوباره افزایش پیدا نمی‌کند."
+                    : "این تغییر وضعیت مجاز نیست؛ وضعیت فعلی سفارش را بررسی کنید.");
+        }
+        if (next == OrderStatus.CANCELLED) {
+            // Same ascending product lock order as checkout; no snapshot fields are changed.
+            for (OrderItem item : order.getItems().stream().sorted(Comparator.comparing(OrderItem::getProductId)).toList()) {
+                var product = products.findForCheckout(item.getProductId()).orElseThrow(() -> new OrderStatusException(
+                        "لغو انجام نشد؛ محصول با شناسه " + item.getProductId() + " حذف شده است. ابتدا موجودی را بررسی کنید؛ هیچ موجودی یا وضعیتی تغییر نکرد."));
+                try { product.restoreStock(item.getQuantity()); }
+                catch (ArithmeticException exception) {
+                    throw new OrderStatusException("لغو انجام نشد؛ بازگردانی موجودی محصول با شناسه " + item.getProductId()
+                            + " از حد مجاز بیشتر می‌شود. هیچ موجودی یا وضعیتی تغییر نکرد.");
+                }
+            }
+        }
+        order.changeStatus(next);
+        orders.flush();
+    }
+
+    private ResponseStatusException missingOrder() {
+        return new ResponseStatusException(HttpStatus.NOT_FOUND, "سفارش پیدا نشد.");
     }
 
     private String newNumber() {

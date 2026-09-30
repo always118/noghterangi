@@ -44,6 +44,8 @@ public class Order {
         totalAmount = Math.addExact(totalAmount, total);
         items.add(new OrderItem(this, productId, name, price, quantity, total));
     }
+    void changeStatus(OrderStatus status) { this.status = status; }
+
     public Long getId() { return id; }
     public String getOrderNumber() { return orderNumber; }
     public String getCustomerName() { return customerName; }

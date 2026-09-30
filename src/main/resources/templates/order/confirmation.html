@@ -21,7 +21,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-6" th:if="${order.status.name() == 'WAITING_FOR_PAYMENT'}">
             <div class="border rounded p-3 text-break" id="payment-instructions">
                 <h2 class="h4">اطلاعات کارت‌به‌کارت</h2>
                 <th:block th:if="${payment.configured}">

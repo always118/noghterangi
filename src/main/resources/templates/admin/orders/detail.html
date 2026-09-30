@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('جزئیات سفارش', ~{::content})}">
+<head><title>جزئیات سفارش</title></head>
+<body><section th:fragment="content">
+    <nav th:replace="~{admin/navigation :: navigation}"></nav>
+    <h1 class="h3 mb-4 text-break">سفارش <bdi th:text="${order.orderNumber}"></bdi></h1>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <section class="border rounded p-3 h-100 text-break" aria-labelledby="customer-heading">
+                <h2 id="customer-heading" class="h4">اطلاعات مشتری</h2>
+                <dl class="mb-0">
+                    <dt>نام مشتری</dt><dd th:text="${order.customerName}"></dd>
+                    <dt>موبایل</dt><dd><bdi th:text="${order.phone}"></bdi></dd>
+                    <dt>محله / محدوده تحویل</dt><dd th:text="${order.deliveryArea}"></dd>
+                    <dt>نشانی تحویل</dt><dd class="product-description" th:text="${order.deliveryAddress}"></dd>
+                    <dt>یادداشت مشتری</dt><dd class="product-description" th:text="${#strings.isEmpty(order.customerNote) ? 'بدون یادداشت' : order.customerNote}"></dd>
+                </dl>
+            </section>
+        </div>
+        <div class="col-lg-6">
+            <section class="border rounded p-3 h-100 text-break" aria-labelledby="status-heading">
+                <h2 id="status-heading" class="h4">وضعیت سفارش</h2>
+                <p id="current-status" class="fw-bold" th:text="${order.status.label}"></p>
+                <p>زمان ثبت (تهران): <bdi th:text="${#temporals.format(order.createdAt.atZone(T(java.time.ZoneId).of('Asia/Tehran')), 'yyyy/MM/dd HH:mm')}"></bdi></p>
+                <p id="admin-order-total">مبلغ کل: <bdi th:text="${#numbers.formatInteger(order.totalAmount, 1, 'COMMA')}"></bdi> تومان</p>
+                <form th:unless="${#lists.isEmpty(transitions)}" th:action="@{/admin/orders/{id}/status(id=${order.id})}" method="post">
+                    <label for="next-status" class="form-label">وضعیت جدید</label>
+                    <select id="next-status" name="status" class="form-select py-2 mb-3" required aria-describedby="status-help">
+                        <option value="">انتخاب کنید</option>
+                        <option th:each="status : ${transitions}" th:value="${status}" th:text="${status.label}"></option>
+                    </select>
+                    <p id="status-help" class="small text-muted">لغو سفارش موجودی کالاها را یک‌بار بازمی‌گرداند و قابل بازگشت نیست. بازپرداخت وجه به‌صورت خودکار انجام نمی‌شود.</p>
+                    <button class="btn btn-primary" type="submit">ثبت وضعیت</button>
+                </form>
+                <p th:if="${#lists.isEmpty(transitions)}" class="text-muted">این سفارش در وضعیت نهایی است و امکان تغییر ندارد.</p>
+            </section>
+        </div>
+    </div>
+    <h2 class="h4">کالاهای سفارش</h2>
+    <p class="small text-muted">نام و قیمت‌ها مربوط به زمان ثبت سفارش هستند.</p>
+    <ul class="list-unstyled row g-3">
+        <li th:each="item : ${order.items}" class="col-12 col-md-6">
+            <article class="border rounded p-3 h-100 text-break">
+                <h3 class="h5" th:text="${item.productName}"></h3>
+                <p>قیمت واحد: <bdi th:text="${#numbers.formatInteger(item.unitPrice, 1, 'COMMA')}"></bdi> تومان</p>
+                <p>تعداد: <span th:text="${item.quantity}"></span></p>
+                <p class="mb-0">جمع ردیف: <bdi th:text="${#numbers.formatInteger(item.lineTotal, 1, 'COMMA')}"></bdi> تومان</p>
+            </article>
+        </li>
+    </ul>
+    <a class="btn btn-outline-secondary mt-3" th:href="@{/admin/orders}">بازگشت به سفارش‌ها</a>
+</section></body></html>

@@ -505,11 +505,31 @@ snapshots in `orders` and `order_items` (Flyway V7). Item product IDs deliberate
 no product foreign key, so historical records survive product deletion.
 Product rows are locked in ID order during checkout. Creating the order/items and
 reducing stock share one transaction; the HTTP-session cart is cleared after commit.
-Unpaid orders consume stock. Cancellation/restocking and payment verification are
-not implemented in Phase 11; there are no reservation timers or expiration jobs.
+Unpaid orders consume stock. Eligible admin cancellation restores stock transactionally;
+payment verification remains manual. There are no reservation timers or expiration jobs.
 Amounts are whole Toman and exclude shipping charges.
 
 Confirmation uses a public random order number and is restricted to the session
 that placed the order. Keep the number for support: session expiry removes browser
 access to confirmation, but does not delete the persisted order. There is no guest
 order lookup, account, online gateway, or receipt upload in this phase.
+
+## Admin order management
+
+`/admin/orders` requires the existing administrator login. Orders use 20-row database
+pages, newest first (creation time then ID), with an optional status filter. Details
+show historical item snapshots and escaped customer information; pages use no-store caching.
+
+Allowed transitions are `WAITING_FOR_PAYMENT → PAID → PREPARING → READY → DELIVERED`.
+Any pre-delivery state may become `CANCELLED`; delivered and cancelled are terminal.
+Normal fulfillment changes do not affect stock. Cancellation locks the order row,
+then product rows in ascending ID order, and restores exactly the ordered quantities
+in the same transaction as the status change. The persisted CANCELLED status prevents
+repeat or concurrent cancellation from restoring stock twice. Inactive products can
+receive restored stock without being reactivated.
+
+If any referenced product is missing or restoration would exceed integer stock capacity,
+the whole cancellation is rejected and all stock/status changes roll back. The admin
+message identifies the product ID for manual investigation; historical snapshots stay intact.
+There is no partial cancellation, automatic refund, or override for missing products.
+Customer confirmation shows payment instructions only while waiting for payment.
