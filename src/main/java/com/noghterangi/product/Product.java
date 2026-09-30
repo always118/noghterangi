@@ -71,6 +71,11 @@ public class Product {
         playingTimeMinutes = form.getType() == ProductType.BOARD_GAME ? form.getPlayingTimeMinutes() : null;
     }
 
+    public void decreaseStock(int quantity) {
+        if (quantity < 1 || quantity > stockQuantity) { throw new IllegalArgumentException("Invalid stock decrease"); }
+        stockQuantity -= quantity;
+    }
+
     void setActive(boolean active) { this.active = active; }
     @PrePersist
     void onCreate() { createdAt = updatedAt = Instant.now(); }

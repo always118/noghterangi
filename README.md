@@ -491,3 +491,25 @@ Confirm quantity limits, disabled cart control, unknown/inactive 404, and layout
 at 360/768/1440px. Recheck admin login/category/product/media management plus catalog
 search/filter/pagination. Product Detail does not add related products, reviews,
 ratings, recommendations, or any Shopping Cart implementation.
+
+## Guest checkout and orders
+
+Set `STORE_PAYMENT_CARD_NUMBER`, `STORE_PAYMENT_ACCOUNT_NAME`, and
+`STORE_PAYMENT_INSTRUCTIONS` in the local environment before accepting orders.
+The instructions are plain text and should explain where to send payment confirmation
+with the order number. `.env.example` intentionally leaves these values empty;
+checkout is unavailable until all three are supplied. Never commit real bank details.
+
+Guest checkout uses current database prices and stores immutable product-name/price
+snapshots in `orders` and `order_items` (Flyway V7). Item product IDs deliberately have
+no product foreign key, so historical records survive product deletion.
+Product rows are locked in ID order during checkout. Creating the order/items and
+reducing stock share one transaction; the HTTP-session cart is cleared after commit.
+Unpaid orders consume stock. Cancellation/restocking and payment verification are
+not implemented in Phase 11; there are no reservation timers or expiration jobs.
+Amounts are whole Toman and exclude shipping charges.
+
+Confirmation uses a public random order number and is restricted to the session
+that placed the order. Keep the number for support: session expiry removes browser
+access to confirmation, but does not delete the persisted order. There is no guest
+order lookup, account, online gateway, or receipt upload in this phase.

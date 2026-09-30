@@ -13,7 +13,7 @@
 | 8 | Product Catalog | DONE | V6 normalization + PostgreSQL filters/sorts/pagination; 53 tests; Chromium catalog/admin regressions + RTL 360/768/1440px; /, /products, /health HTTP 200 |
 | 9 | Product Detail | DONE | Public slug detail + gallery + safe descriptions/specifications; 60 tests; Chromium keyboard/quantity/404 + RTL 360/768/1440px and admin/catalog regressions passed |
 | 10 | Shopping Cart | DONE | Session cart + current prices/availability + CSRF; Java 21 mvn clean verify (67 tests); Chromium cart/no-JS/admin/catalog/detail/image regressions; RTL 360/768/1440px passed |
-| 11 | Checkout and Orders | NOT_STARTED | — |
+| 11 | Checkout and Orders | DONE | V7 orders/snapshots + atomic stock locks + configured payment; Java 21 mvn clean verify (77 tests); rollback/concurrency/CSRF; Chromium checkout/failures/DB/regressions and RTL 360/768/1440px passed |
 | 12 | Admin Orders | NOT_STARTED | — |
 | 13 | Real Homepage | NOT_STARTED | — |
 | 14 | UX Polish | NOT_STARTED | — |

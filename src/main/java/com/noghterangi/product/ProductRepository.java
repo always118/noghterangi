@@ -20,6 +20,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     Optional<Product> findById(Long id);
     @EntityGraph(attributePaths = "category")
     Optional<Product> findBySlugAndActiveTrueAndCategoryActiveTrue(String slug);
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select p from Product p where p.id = :id")
+    Optional<Product> findForCheckout(@org.springframework.data.repository.query.Param("id") Long id);
     boolean existsBySlug(String slug);
     boolean existsBySlugAndIdNot(String slug, Long id);
     boolean existsBySku(String sku);

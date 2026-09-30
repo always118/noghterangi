@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('تکمیل سفارش', ~{::content})}">
+<head><title>تکمیل سفارش</title></head>
+<body><section th:fragment="content">
+    <h1 class="h2 mb-4">تکمیل سفارش</h1>
+    <p>بدون نیاز به حساب کاربری، اطلاعات تحویل را وارد کنید.</p>
+    <div th:unless="${paymentConfigured}" class="alert alert-warning" role="alert">ثبت سفارش موقتاً در دسترس نیست؛ اطلاعات پرداخت فروشگاه تنظیم نشده است.</div>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <form th:action="@{/checkout}" method="post" th:object="${checkoutForm}">
+                <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">اطلاعات سفارش کامل نیست؛ موارد مشخص‌شده را اصلاح کنید.</div>
+                <div class="mb-3">
+                    <label for="customerName" class="form-label">نام و نام خانوادگی</label>
+                    <input class="form-control" th:field="*{customerName}" required maxlength="160" autocomplete="name" th:classappend="${#fields.hasErrors('customerName')} ? 'is-invalid'" aria-describedby="name-error">
+                    <div id="name-error" class="invalid-feedback" th:errors="*{customerName}"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">شماره موبایل</label>
+                    <input class="form-control" th:field="*{phone}" type="tel" inputmode="tel" required maxlength="11" autocomplete="tel" dir="ltr" placeholder="09xxxxxxxxx" th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid'" aria-describedby="phone-help phone-error">
+                    <div id="phone-help" class="form-text">۱۱ رقم، شروع با ۰۹؛ ارقام فارسی و انگلیسی پذیرفته می‌شوند.</div>
+                    <div id="phone-error" class="invalid-feedback" th:errors="*{phone}"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="deliveryArea" class="form-label">محله / محدوده تحویل</label>
+                    <input class="form-control" th:field="*{deliveryArea}" required maxlength="160" autocomplete="address-level3" th:classappend="${#fields.hasErrors('deliveryArea')} ? 'is-invalid'" aria-describedby="area-error">
+                    <div id="area-error" class="invalid-feedback" th:errors="*{deliveryArea}"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="deliveryAddress" class="form-label">نشانی کامل تحویل</label>
+                    <textarea class="form-control" th:field="*{deliveryAddress}" rows="3" required maxlength="1000" autocomplete="street-address" th:classappend="${#fields.hasErrors('deliveryAddress')} ? 'is-invalid'" aria-describedby="address-error"></textarea>
+                    <div id="address-error" class="invalid-feedback" th:errors="*{deliveryAddress}"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="customerNote" class="form-label">یادداشت سفارش (اختیاری)</label>
+                    <textarea class="form-control" th:field="*{customerNote}" rows="2" maxlength="1000" th:classappend="${#fields.hasErrors('customerNote')} ? 'is-invalid'" aria-describedby="note-error"></textarea>
+                    <div id="note-error" class="invalid-feedback" th:errors="*{customerNote}"></div>
+                </div>
+                <p class="small text-muted">قیمت و موجودی هنگام ثبت دوباره بررسی می‌شود؛ مبلغ نهایی در تأیید سفارش نمایش داده می‌شود. هزینه ارسال در این مبلغ محاسبه نشده است.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <button class="btn btn-primary" type="submit" th:disabled="${!paymentConfigured}">ثبت سفارش</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/cart}">بازگشت به سبد</a>
+                </div>
+            </form>
+        </div>
+        <aside class="col-lg-5" aria-label="خلاصه سفارش">
+            <div class="border rounded p-3">
+                <h2 class="h4">خلاصه سفارش</h2>
+                <div th:each="line : ${cartView.lines}" class="border-bottom py-3 text-break">
+                    <h3 class="h6" th:text="${line.product.name}"></h3>
+                    <p>تعداد: <span th:text="${line.quantity}"></span></p>
+                    <p>قیمت واحد: <bdi th:text="${#numbers.formatInteger(line.product.price, 1, 'COMMA')}"></bdi> تومان</p>
+                    <p class="mb-0">جمع: <bdi th:text="${#numbers.formatInteger(line.total, 1, 'COMMA')}"></bdi> تومان</p>
+                </div>
+                <p class="fw-bold mt-3 mb-0 text-break" id="checkout-total">مبلغ کالاها: <bdi th:text="${#numbers.formatInteger(cartView.subtotal, 1, 'COMMA')}"></bdi> تومان</p>
+            </div>
+        </aside>
+    </div>
+</section></body></html>

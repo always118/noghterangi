@@ -51,7 +51,8 @@
         <p class="h5 text-break" id="cart-subtotal">جمع کالاها: <span th:if="${cartView.subtotal != null}"><bdi th:text="${#numbers.formatInteger(cartView.subtotal, 1, 'COMMA')}"></bdi> تومان</span><span th:if="${cartView.subtotal == null}">مبلغ بیش از حد مجاز است؛ تعداد را کاهش دهید.</span></p>
         <p class="small text-muted">جمع شامل ردیف‌های نیازمند اصلاح نیز هست؛ هزینه ارسال محاسبه نشده است.</p>
         <div class="d-flex flex-wrap gap-3 mt-4">
-            <a class="btn btn-primary" th:href="@{/products}">ادامه خرید</a>
+            <a th:if="${cartView.valid}" class="btn btn-primary" th:href="@{/checkout}">تکمیل سفارش</a>
+            <a class="btn btn-outline-primary" th:href="@{/products}">ادامه خرید</a>
             <form th:action="@{/cart/clear}" method="post"><button class="btn btn-outline-danger">خالی کردن سبد</button></form>
         </div>
     </th:block>

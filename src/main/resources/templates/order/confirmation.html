@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: page('تأیید سفارش', ~{::content})}">
+<head><title>تأیید سفارش</title></head>
+<body><section th:fragment="content">
+    <h1 class="h2 mb-4">سفارش شما ثبت شد</h1>
+    <div class="alert alert-success" role="status">سفارش ثبت شد. وضعیت فعلی سفارش در ادامه نمایش داده می‌شود.</div>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="border rounded p-3 h-100 text-break">
+                <h2 class="h4">مشخصات سفارش</h2>
+                <p>شماره سفارش: <bdi id="order-number" th:text="${order.orderNumber}"></bdi></p>
+                <p id="order-total">مبلغ قابل پرداخت: <bdi th:text="${#numbers.formatInteger(order.totalAmount, 1, 'COMMA')}"></bdi> تومان</p>
+                <p>وضعیت سفارش: <strong th:text="${order.status.label}">در انتظار پرداخت</strong></p>
+                <p class="small text-muted">شماره سفارش را نگه دارید. این صفحه فقط در همین مرورگر و تا پایان نشست در دسترس است. مبلغ بالا شامل هزینه ارسال نیست.</p>
+                <ul class="list-unstyled">
+                    <li th:each="item : ${order.items}" class="border-top pt-2 mt-2">
+                        <span th:text="${item.productName}"></span> × <span th:text="${item.quantity}"></span>
+                        <p class="mb-1">قیمت واحد: <bdi th:text="${#numbers.formatInteger(item.unitPrice, 1, 'COMMA')}"></bdi> تومان</p>
+                        <p>جمع: <bdi th:text="${#numbers.formatInteger(item.lineTotal, 1, 'COMMA')}"></bdi> تومان</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="border rounded p-3 text-break" id="payment-instructions">
+                <h2 class="h4">اطلاعات کارت‌به‌کارت</h2>
+                <th:block th:if="${payment.configured}">
+                    <p>مبلغ سفارش را به کارت زیر واریز کنید و تأیید پرداخت را همراه شماره سفارش طبق راهنمای زیر ارسال کنید.</p>
+                    <p>شماره کارت: <bdi th:text="${payment.cardNumber}"></bdi></p>
+                    <p>نام صاحب حساب: <span th:text="${payment.accountName}"></span></p>
+                    <p class="product-description" th:text="${payment.instructions}"></p>
+                </th:block>
+                <p th:unless="${payment.configured}" class="alert alert-warning">اطلاعات پرداخت موقتاً در دسترس نیست؛ شماره سفارش را نگه دارید و با فروشگاه هماهنگ کنید.</p>
+            </div>
+        </div>
+    </div>
+    <a class="btn btn-primary mt-4" th:href="@{/products}">بازگشت به محصولات</a>
+</section></body></html>
