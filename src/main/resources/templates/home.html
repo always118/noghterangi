@@ -4,37 +4,31 @@
 <head><title>نقطه رنگی</title></head>
 <body>
 <th:block th:fragment="content">
-    <section class="hero mb-5" aria-labelledby="hero-title">
-        <div class="row g-4 align-items-center">
-            <div class="col-lg-7">
-                <p class="eyebrow">به دنیای نقطه رنگی خوش آمدید</p>
-                <h1 id="hero-title">اینجا، هر روز<br><span>رنگ تازه‌ای دارد.</span></h1>
-                <p class="hero-description mt-3 mb-4">از اولین خط یک دفتر تا هیجان یک بازی دورهمی؛ برای لحظه‌های کوچک و دوست‌داشتنی کنار هم هستیم.</p>
-                <a class="btn btn-primary" href="#categories">کشف دنیای رنگی ما <span aria-hidden="true">←</span></a>
-                <p class="small text-muted mt-3 mb-0">یک نگاه به فروشگاهی که در راه است</p>
+    <section class="hero home-hero mb-4" aria-labelledby="hero-title">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-8">
+                <p class="eyebrow">به نقطه رنگی خوش آمدید</p>
+                <h1 id="hero-title">دنیایی از <span>رنگ، فکر و خیال</span></h1>
+                <p class="hero-description mb-3">انتخاب‌های جذاب برای یادگیری، بازی و خلاقیت</p>
+                <p class="home-interests"><span>لوازم‌التحریر</span> <span aria-hidden="true">·</span> <span>کتاب کودک</span> <span aria-hidden="true">·</span> <span>بازی فکری</span></p>
+                <a class="btn btn-primary" th:href="@{/products}">دیدن همهٔ محصولات <span aria-hidden="true">←</span></a>
             </div>
-            <div class="col-lg-5">
-                <div class="hero-art" aria-hidden="true">
-                    <span class="art-caption">بنویس. بازی کن. خیال بساز.</span>
-                    <div class="notebook"><span>ایده‌های<br>رنگی من</span></div>
-                    <div class="pencil"></div>
-                    <div class="game-tile">✦</div>
-                    <span class="art-dot"></span>
-                </div>
+            <div class="col-md-4 home-logo-wrap">
+                <img class="home-logo" th:src="@{/images/brand-logo.jpg}" alt="نقطه رنگی" width="240" height="240" fetchpriority="high">
             </div>
         </div>
     </section>
 
-    <section class="search-demo mb-5" aria-labelledby="search-title">
+    <section class="home-search mb-5" aria-labelledby="search-title">
         <div class="row g-3 align-items-center">
             <div class="col-md-5">
-                <h2 id="search-title" class="h5">دنبال چه رنگی از شادی می‌گردی؟</h2>
-                <p id="search-help" class="small text-muted mb-0">محصول دلخواهتان را در فروشگاه پیدا کنید.</p>
+                <h2 id="search-title" class="h5 mb-1">دنبال چی می‌گردی؟</h2>
+                <p class="small text-muted mb-0">محصول دلخواهت را پیدا کن.</p>
             </div>
             <div class="col-md-7">
-                <label class="visually-hidden" for="demo-search">جست‌وجو در فروشگاه</label>
-                <form class="d-flex gap-2" method="get" th:action="@{/products}">
-                    <input id="demo-search" name="q" maxlength="160" class="form-control" type="search" placeholder="دفتر، مدادرنگی، بازی..." aria-describedby="search-help">
+                <form class="d-flex gap-2" method="get" th:action="@{/products}" role="search">
+                    <label class="visually-hidden" for="home-search">جست‌وجو در محصولات</label>
+                    <input id="home-search" name="q" maxlength="160" class="form-control" type="search" placeholder="دفتر، مدادرنگی، قمقمه…">
                     <button class="btn btn-primary flex-shrink-0" type="submit">جست‌وجو</button>
                 </form>
             </div>
@@ -42,47 +36,56 @@
     </section>
 
     <section id="categories" class="mb-5" aria-labelledby="categories-title">
-        <p class="eyebrow">برای هر سلیقه، یک دنیای کوچک</p>
-        <h2 id="categories-title" class="section-title">دنیای رنگی ما</h2>
+        <p class="eyebrow">از اینجا شروع کن</p>
+        <h2 id="categories-title" class="section-title mb-3">دنیای رنگی ما</h2>
         <p th:if="${#lists.isEmpty(activeCategories)}" class="text-muted">دسته‌بندی‌ها به‌زودی اضافه می‌شوند.</p>
         <div class="row g-3">
-            <div class="col-12 col-sm-6 col-lg-3" th:each="category, item : ${activeCategories}">
-                <article class="category-card text-break" th:id="'category-' + ${category.slug}"
+            <div class="col-6 col-lg-3" th:each="category, item : ${activeCategories}">
+                <article class="category-card home-category text-break" th:id="'category-' + ${category.slug}"
                          th:classappend="${ {'tone-mint', 'tone-peach', 'tone-lilac', 'tone-sand'}[item.index % 4]}">
-                    <span class="category-symbol" aria-hidden="true">✦</span>
-                    <h3 class="h5"><a th:href="@{/products(category=${category.slug})}" th:text="${category.name}"></a></h3>
-                    <p class="mb-0" th:if="${!#strings.isEmpty(category.description)}" th:text="${category.description}"></p>
+                    <a th:href="@{/products(category=${category.slug})}" class="home-category-link">
+                        <img th:if="${categoryImages[category.name] != null}" th:src="@{/images/categories/{file}(file=${categoryImages[category.name]})}" alt="" width="280" height="160" loading="lazy">
+                        <span th:unless="${categoryImages[category.name] != null}" class="category-symbol" aria-hidden="true">✦</span>
+                        <h3 class="h6 mb-0" th:text="${category.name}"></h3>
+                    </a>
+                    <p class="small mt-2 mb-0" th:if="${!#strings.isEmpty(category.description)}" th:text="${category.description}"></p>
                 </article>
             </div>
         </div>
     </section>
 
-    <section id="inspiration" class="mb-5" aria-labelledby="inspiration-title">
+    <section id="new-products" class="mb-5" aria-labelledby="new-products-title">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-            <h2 id="inspiration-title" class="section-title mb-0">چند ایده برای روزهای رنگی</h2>
-            <span class="demo-badge">نمونه‌های نمایشی</span>
+            <h2 id="new-products-title" class="section-title mb-0">تازه‌های نقطه رنگی</h2>
+            <a th:href="@{/products(sort=NEWEST)}">همهٔ محصولات <span aria-hidden="true">←</span></a>
         </div>
-        <div class="row g-4">
-            <div class="col-12 col-sm-6 col-lg-4">
-                <article class="card product-card h-100">
-                    <div class="product-art tone-mint" aria-hidden="true"><div class="mini-notebook">دفتر خیال</div></div>
-                    <div class="card-body"><p class="small text-muted">نوشتن و خیال‌پردازی</p><h3 class="h5">دفتر ایده‌های تازه</h3><p>جایی برای فکرهای کوچک و رویاهای بزرگ.</p><span class="availability">به‌زودی</span></div>
-                </article>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-4">
-                <article class="card product-card h-100">
-                    <div class="product-art tone-peach" aria-hidden="true"><div class="color-pencils"><i></i><i></i><i></i><i></i><i></i></div></div>
-                    <div class="card-body"><p class="small text-muted">نقاشی و خلاقیت</p><h3 class="h5">یک جعبه رنگ و خیال</h3><p>برای وقتی که حرف‌ها، رنگ می‌شوند.</p><span class="availability">به‌زودی</span></div>
-                </article>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-4">
-                <article class="card product-card h-100">
-                    <div class="product-art tone-lilac" aria-hidden="true"><div class="demo-dice">⚄</div></div>
-                    <div class="card-body"><p class="small text-muted">بازی و دورهمی</p><h3 class="h5">بهانه‌ای برای باهم بودن</h3><p>لحظه‌های پر از فکر، خنده و رقابت دوستانه.</p><span class="availability">به‌زودی</span></div>
-                </article>
+        <p th:if="${#lists.isEmpty(home.newest)}" class="text-muted">محصولات به‌زودی اضافه می‌شوند.</p>
+        <div class="row g-3 g-md-4">
+            <div class="col-6 col-md-4 col-lg-3" th:each="product : ${home.newest}">
+                <article th:replace="~{fragments/catalog-card :: card(${product}, ${home.images[product.id]})}"></article>
             </div>
         </div>
     </section>
+
+    <section id="featured-products" class="mb-5" aria-labelledby="featured-title" th:if="${!#lists.isEmpty(home.featured)}">
+        <p class="eyebrow">انتخاب‌های ویژه</p>
+        <h2 id="featured-title" class="section-title mb-3">ویژه‌های نقطه رنگی</h2>
+        <div class="row g-3 g-md-4">
+            <div class="col-6 col-md-4 col-lg-3" th:each="product : ${home.featured}">
+                <article th:replace="~{fragments/catalog-card :: card(${product}, ${home.images[product.id]})}"></article>
+            </div>
+        </div>
+    </section>
+
+    <section id="board-games" class="mb-5" aria-labelledby="games-title" th:if="${!#lists.isEmpty(home.games)}">
+        <h2 id="games-title" class="section-title mb-3">بازی‌های فکری</h2>
+        <div class="row g-3 g-md-4">
+            <div class="col-6 col-md-4 col-lg-3" th:each="product : ${home.games}">
+                <article th:replace="~{fragments/catalog-card :: card(${product}, ${home.images[product.id]})}"></article>
+            </div>
+        </div>
+    </section>
+    <script th:src="@{/js/catalog-images.js}" defer></script>
 </th:block>
 </body>
 </html>

@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 12 — Admin Orders
+Phase 13 — Real Homepage
 
 Status: DONE
 
@@ -21,6 +21,7 @@ Status: DONE
 - Phase 10 — Shopping Cart
 - Phase 11 — Checkout and Orders
 - Phase 12 — Admin Orders
+- Phase 13 — Real Homepage
 
 Note:
 Phase 5 Categories was implemented before Phase 4 because the project
@@ -29,13 +30,12 @@ Admin Security now protects the existing category routes and future admin routes
 
 ## Current Work
 
-Phase 12 complete: protected paginated order list/detail, explicit status transitions,
-and transactional cancellation with exactly-once stock restoration. All required checks passed.
-Phase 13 awaits explicit approval.
+Phase 13 completed: database-driven homepage with approved branding and reviewed supplied development products.
+Original logo/photos are preserved. User explicitly authorized sample prices for the visual preview.
 
 ## Next Phase
 
-Phase 13 — Real Homepage (NOT_STARTED; explicit approval required)
+Phase 14 — UX Polish (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
@@ -54,7 +54,9 @@ Phase 13 — Real Homepage (NOT_STARTED; explicit approval required)
 - Category domain and admin management with optional two-level parent
 - Product domain and protected admin management
 - Media metadata and replaceable local storage; JPEG/PNG product images
-- active category display on public homepage
+- database-driven homepage: active root categories, newest/featured/board-game sections (eight products each), batched primary images
+- supplied logo and four reviewed category photos; shared catalog cards and GET search
+- opt-in dev/test importer with production-profile exclusion, per-product/media transactions, idempotence, and reports
 - Public product catalog with PostgreSQL search/filter/sort and Spring Data pagination
 - Public product detail by slug with gallery, breadcrumbs, and friendly 404
 - Anonymous HTTP-session cart with product-detail add, quantity controls, subtotal, and navigation badge
@@ -112,31 +114,39 @@ Phase 13 — Real Homepage (NOT_STARTED; explicit approval required)
 - Order totals use whole Toman and exclude shipping charges. No gateway, receipt upload, or customer accounts.
 - Temporary runtime credentials/data removed and verification server stopped.
 
+- Supplied development catalog: 15 products, 17 stored product images, four categories and four group photos.
+- All prices are user-authorized development samples, not confirmed retail prices; unknown stock remains zero.
+- Three featured flags are documented demo selections. Required generated DEV-P13 SKUs must later be replaced.
+- Three Sport Life variants have no individual photo and use the normal placeholder; their shared group photo is used only for the category.
+- Twenty broader/conflicting chat records are isolated in dev-data/data-review.md. No board-game products were supplied.
+- Import requires dev/test plus app.dev-data.enabled=true; prod/production exclude it. Use only a development DB URL.
+- No Flyway migration, dependency, security-rule or production seed changes in Phase 13.
+
 ## Last Verification
 
-- Java 21 `mvn clean verify` PASSED: 87 tests, 0 failures/errors/skipped (2026-09-30).
-- Ten admin-order integration tests cover anonymous blocking, admin access, CSRF, newest-first ordering,
-  20-row database paging, status filtering/paging links, malformed input/missing orders, historical snapshots,
-  escaped customer data, allowed/invalid transitions, all pre-delivery cancellation states, and terminal states.
-- Exact quantities restored across multiple products, including inactive products. Repeated and concurrent
-  cancellation restored stock once. Missing product, integer overflow, and forced PostgreSQL status-update
-  failure rolled back all status/stock changes. Cancelled confirmation no longer requests payment.
-- Packaged app started against PostgreSQL; Flyway V1–V7 validation and Hibernate ddl-auto=validate passed.
-  No migration, dependency, or security-rule changes were required.
-- Anonymous admin list/detail were blocked; authenticated list/detail/filter/paging worked. CSRF-less status
-  POST returned 403; invalid/repeated transitions and missing orders produced Persian messages.
-- Chromium exercised WAITING_FOR_PAYMENT → PAID → PREPARING → READY → DELIVERED; PostgreSQL confirmed
-  stock stayed unchanged. Separate cancellation restored stock 47 → 50 for three units; retry remained 50.
-  Cancelled orders could not return to fulfillment; delivered orders could not move backward.
-- Twenty-three real checkout orders verified newest-first listing, 20/3 pagination, waiting-status 20/1 paging,
-  cancelled filtering, current status labels, persisted totals, and historical snapshot display.
-- Admin order list/detail fit 360/768/1440px without horizontal overflow; RTL and all six screenshots reviewed.
-- Browser regressions passed: homepage/health, catalog search/filter/sort/pagination, product detail/gallery,
-  complete cart lifecycle and no-JavaScript cart operation, checkout success/failure/current-price snapshots,
-  order creation, session privacy, admin login/logout, category/product management, and image management.
-- Temporary 23 orders/items, 20 products (one deleted during failure verification), four categories, images,
-  credentials, and isolated image storage removed; verification server stopped.
-- Phase 12 DONE. Phase 13 remains NOT_STARTED. No automatic commit.
+- Final Java 21 `mvn clean verify` PASSED: 96 tests, 0 failures/errors/skipped (2026-09-30).
+- New homepage tests verify anonymous access, active root categories, bounded/stable newest ordering,
+  active product/category visibility, optional featured/game sections, links/search and shared image/placeholder cards.
+- Import tests verify opt-in/profile guards (including mixed dev + production), repeat/no-overwrite behavior,
+  category conflicts, duplicate manifest keys, bad prices, missing/corrupt/traversal images and per-product rollback.
+- Packaged app started twice in dev mode against PostgreSQL; Flyway V1–V7 and Hibernate validation passed.
+- First run imported 15 products, 17 media and four categories. Second run created zero rows/images and retained all 15 products.
+  Reports: dev-data/import-report-first-run.md and dev-data/import-report.md; source decisions: dev-data/data-review.md.
+- Real-data Chromium checks passed: /, /health, /products, all 15 product details, all 17 media endpoints,
+  four pictured categories, eight newest cards, three featured cards, hidden empty game section, search,
+  category/product links, zero cart badge and unavailable products. Import report URL returned 404.
+- Homepage at 360/768/1440px: Persian RTL, no horizontal overflow, loaded photos and touch-size search controls.
+  Supplied-photo contact sheet and responsive screenshots reviewed. Unsupported hero emoji glyphs removed;
+  final screenshots refreshed in dev-data/verification/ after the final successful build and browser checks.
+- Browser regressions passed: admin login/logout, category/product CRUD and activation, image upload/order/removal,
+  catalog search/filter/sort/pagination, product detail/gallery, cart lifecycle and no-JavaScript cart,
+  checkout validation/failures/snapshots/session privacy, and admin order filtering/paging/status/cancellation.
+- Temporary board-game fixtures verified the nonempty homepage game section. Full order status progression,
+  cancellation/retry and database inventory assertions passed; all relevant views fit 360/768/1440px.
+- Temporary 23 orders/items, 20 test products (one deleted during failure verification), four categories,
+  test media and verification credentials removed; server stopped. The supplied development catalog remains:
+  15 products, 17 media, four categories, zero stock and zero orders.
+- Phase 13 DONE. Phase 14 NOT_STARTED. No automatic commit.
 
 ## Last Updated
 

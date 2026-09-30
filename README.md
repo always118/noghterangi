@@ -1,7 +1,7 @@
 # Noghte Rangi — نقطه رنگی
 
 A Persian local online shop built incrementally as a simple Spring Boot modular
-monolith. Current implementation: **Phase 9 — Product Detail**, with public browsing and protected category, product, and image administration.
+monolith. Current implementation: **Phase 13 — Real Homepage**, with database-driven product discovery, cart, guest checkout, and protected catalog/order administration.
 
 ## Prerequisites
 
@@ -533,3 +533,17 @@ the whole cancellation is rejected and all stock/status changes roll back. The a
 message identifies the product ID for manual investigation; historical snapshots stay intact.
 There is no partial cancellation, automatic refund, or override for missing products.
 Customer confirmation shows payment instructions only while waiting for payment.
+
+## Reviewed development products (Phase 13)
+
+See [dev-data/README.md](dev-data/README.md) for the explicit opt-in importer and
+[data review](dev-data/data-review.md) for source decisions. Fifteen supplied products
+use user-authorized **sample prices**, zero unknown stock, and three documented demo
+featured flags. No business price or inventory is implied. Import is disabled by
+default and excluded from production profiles. It never updates existing records.
+
+The homepage queries at most eight products per section (newest, featured, board games),
+fetches categories with each product, and batches primary-image lookup across sections.
+Only active root categories appear on the homepage. As in the catalog, product visibility
+requires its own category to be active; its parent's active state is independent. Empty
+featured/game sections are omitted. The existing catalog card and GET search are reused.

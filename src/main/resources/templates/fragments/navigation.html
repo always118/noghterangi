@@ -3,7 +3,7 @@
 <body>
 <nav th:fragment="navigation" class="navbar navbar-expand-md py-3" aria-label="منوی اصلی">
     <a class="navbar-brand brand d-flex align-items-center gap-2" th:href="@{/}">
-        <span class="brand-dot" aria-hidden="true"></span>نقطه رنگی
+        <img class="brand-logo" th:src="@{/images/brand-logo.jpg}" alt="" width="44" height="44">نقطه رنگی
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navigation"
             aria-controls="main-navigation" aria-expanded="false" aria-label="باز و بسته کردن منو">
@@ -23,7 +23,6 @@
                     </ul>
                 </details>
             </li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/#inspiration}">ایده‌های رنگی</a></li>
             <li class="nav-item"><a class="nav-link" th:href="@{/#about}">درباره نقطه رنگی</a></li>
         </ul>
         <a class="nav-link ms-md-3 text-nowrap" th:href="@{/cart}">سبد خرید <span id="cart-count" class="badge bg-primary" aria-label="تعداد کل کالاها" th:text="${cartCount}">0</span></a>
