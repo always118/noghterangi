@@ -15,7 +15,7 @@
     <h1 id="product-title" class="h2 text-break mb-4" th:text="${product.name}"></h1>
     <div class="row g-4 mb-4">
         <section class="col-md-6 order-md-2" aria-label="اطلاعات و موجودی محصول">
-            <p th:if="${!#strings.isEmpty(product.brand)}">برند: <span th:text="${product.brand}"></span></p>
+            <p th:if="${!#strings.isEmpty(product.brand)}">برند: <bdi th:text="${product.brand}"></bdi></p>
             <p id="product-price" class="h4 mb-3"><bdi th:text="${#numbers.formatInteger(product.price, 1, 'COMMA')}"></bdi> تومان</p>
             <p id="product-availability" class="fw-bold" th:classappend="${product.stockQuantity > 0} ? 'text-success' : 'text-secondary'"
                th:text="${product.stockQuantity > 0} ? 'موجود' : 'ناموجود'"></p>
@@ -24,10 +24,11 @@
             <form class="border rounded p-3" th:action="@{/cart/items}" method="post" aria-describedby="cart-help">
                 <input type="hidden" name="productId" th:value="${product.id}">
                 <label for="quantity" class="form-label">تعداد</label>
-                <input id="quantity" name="quantity" class="form-control quantity-input mb-3" type="number" min="1" step="1" value="1" required
+                <input id="quantity" name="quantity" class="form-control quantity-input mb-3" type="number" inputmode="numeric" min="1" step="1" value="1" required
                        th:max="${product.stockQuantity > 0} ? ${product.stockQuantity} : 1" th:disabled="${product.stockQuantity <= 0}" aria-describedby="cart-help">
                 <button id="add-to-cart" class="btn btn-primary" type="submit" th:disabled="${product.stockQuantity <= 0}" aria-describedby="cart-help">افزودن به سبد خرید</button>
-                <p id="cart-help" class="small text-muted mt-2 mb-0">افزودن به سبد خرید موجودی را رزرو نمی‌کند؛ قیمت و موجودی فعلی در سبد نمایش داده می‌شود.</p>
+                <p id="cart-help" class="small text-muted mt-2 mb-0" th:text="${product.stockQuantity > 0} ? 'افزودن به سبد خرید موجودی را رزرو نمی‌کند؛ قیمت و موجودی فعلی در سبد نمایش داده می‌شود.' : 'این محصول فعلاً ناموجود است. می‌توانید محصولات دیگر را ببینید.'"></p>
+                <a th:if="${product.stockQuantity <= 0}" class="touch-link" th:href="@{/products(category=${product.category.slug})}">محصولات این دسته</a>
             </form>
         </section>
         <section class="col-md-6 order-md-1" aria-label="تصاویر محصول" data-product-gallery>

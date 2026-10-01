@@ -50,7 +50,7 @@ class HomeIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.body()).contains("dir=\"rtl\"", "id=\"category-" + root.getSlug(),
                 "href=\"/products?category=" + root.getSlug(), "action=\"/products\"", "method=\"get\"", "name=\"q\"",
-                "دنیایی از", "رنگ، فکر و خیال", "/images/brand-logo.jpg", "id=\"cart-count\"")
+                "دنیایی از", "رنگ، فکر و خیال", "/images/brand-logo.jpg", "id=\"cart-count\"", "href=\"/products#catalog-q\"", "/js/public-ux.js")
                 .doesNotContain("id=\"category-" + child.getSlug(), "id=\"category-" + hidden.getSlug(),
                         "نمونه‌های نمایشی", "خرید آنلاین در مرحله‌های بعدی");
     }

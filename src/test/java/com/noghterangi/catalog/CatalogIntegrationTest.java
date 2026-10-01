@@ -153,7 +153,7 @@ class CatalogIntegrationTest {
         String q = URLEncoder.encode("مداد + رنگی & شادی", StandardCharsets.UTF_8);
         var response = browser.get("/products?q=" + q + "&category=" + root.getSlug() + "&minPrice=40&maxPrice=60&available=true&sort=LOWEST_PRICE");
         assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.body()).contains("dir=\"rtl\"", "value=\"مداد + رنگی &amp; شادی\"", "value=\"40\"", "value=\"60\"", "&lt;script&gt;", "rel=\"next\"", "page=1", "available=true", "sort=LOWEST_PRICE")
+        assertThat(response.body()).contains("dir=\"rtl\"", "value=\"مداد + رنگی &amp; شادی\"", "value=\"40\"", "value=\"60\"", "&lt;script&gt;", "دسته root / دسته child", "rel=\"next\"", "page=1", "available=true", "sort=LOWEST_PRICE")
                 .doesNotContain("<script> 0", "th:each");
         assertThat(response.body().split("data-catalog-product=", -1)).hasSize(13);
         var next = java.util.regex.Pattern.compile("<a(?=[^>]*rel=\"next\")(?=[^>]*href=\"([^\"]+)\")[^>]*>").matcher(response.body());

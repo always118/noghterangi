@@ -7,6 +7,7 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findBySlugAndActiveTrue(String slug);
     List<Category> findAllByOrderByNameAscIdAsc();
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "parent")
     List<Category> findByActiveTrueOrderByNameAscIdAsc();
     List<Category> findByParentIsNullOrderByNameAscIdAsc();
     List<Category> findByActiveTrueAndParentIsNullOrderByNameAscIdAsc();

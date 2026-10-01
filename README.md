@@ -1,7 +1,7 @@
 # Noghte Rangi — نقطه رنگی
 
 A Persian local online shop built incrementally as a simple Spring Boot modular
-monolith. Current implementation: **Phase 13 — Real Homepage**, with database-driven product discovery, cart, guest checkout, and protected catalog/order administration.
+monolith. Current implementation: **Phase 14 — UX Polish**, with database-driven product discovery, cart, guest checkout, and protected catalog/order administration.
 
 ## Prerequisites
 
@@ -547,3 +547,12 @@ fetches categories with each product, and batches primary-image lookup across se
 Only active root categories appear on the homepage. As in the catalog, product visibility
 requires its own category to be active; its parent's active state is independent. Empty
 featured/game sections are omitted. The existing catalog card and GET search are reused.
+
+## Public UX (Phase 14)
+
+The cart stays visible on mobile. Navigation supports keyboard dismissal, same-page focus
+and a no-JavaScript fallback. Catalog category choices include the parent name, product cards
+share consistent prices/statuses, and checkout keeps its total visible above expandable item
+details on mobile. Server validation identifies invalid fields and focuses its error summary.
+Order and payment identifiers use directional isolation for Persian RTL. Business rules and
+imported catalog data are unchanged. See [verification and screenshots](dev-data/verification/phase14/README.md).

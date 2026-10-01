@@ -8,8 +8,8 @@
         <div class="col-lg-6">
             <div class="border rounded p-3 h-100 text-break">
                 <h2 class="h4">مشخصات سفارش</h2>
-                <p>شماره سفارش: <bdi id="order-number" th:text="${order.orderNumber}"></bdi></p>
-                <p id="order-total">مبلغ قابل پرداخت: <bdi th:text="${#numbers.formatInteger(order.totalAmount, 1, 'COMMA')}"></bdi> تومان</p>
+                <p>شماره سفارش: <bdi id="order-number" class="order-reference" dir="ltr" th:text="${order.orderNumber}"></bdi></p>
+                <p id="order-total" class="h5">مبلغ سفارش: <bdi th:text="${#numbers.formatInteger(order.totalAmount, 1, 'COMMA')}"></bdi> تومان</p>
                 <p>وضعیت سفارش: <strong th:text="${order.status.label}">در انتظار پرداخت</strong></p>
                 <p class="small text-muted">شماره سفارش را نگه دارید. این صفحه فقط در همین مرورگر و تا پایان نشست در دسترس است. مبلغ بالا شامل هزینه ارسال نیست.</p>
                 <ul class="list-unstyled">
@@ -26,7 +26,7 @@
                 <h2 class="h4">اطلاعات کارت‌به‌کارت</h2>
                 <th:block th:if="${payment.configured}">
                     <p>مبلغ سفارش را به کارت زیر واریز کنید و تأیید پرداخت را همراه شماره سفارش طبق راهنمای زیر ارسال کنید.</p>
-                    <p>شماره کارت: <bdi th:text="${payment.cardNumber}"></bdi></p>
+                    <p>شماره کارت: <bdi class="payment-number" dir="ltr" th:text="${payment.cardNumber}"></bdi></p>
                     <p>نام صاحب حساب: <span th:text="${payment.accountName}"></span></p>
                     <p class="product-description" th:text="${payment.instructions}"></p>
                 </th:block>

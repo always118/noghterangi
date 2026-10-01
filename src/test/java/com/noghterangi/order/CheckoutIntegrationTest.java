@@ -97,7 +97,7 @@ class CheckoutIntegrationTest {
         invalid.put("deliveryArea", ""); invalid.put("deliveryAddress", "");
         assertThat(location(submit(invalid))).isEqualTo("/checkout");
         String body = browser.getHtml("/checkout").body();
-        assertThat(body).contains("نام و نام خانوادگی را وارد کنید", "شماره موبایل را", "محله یا محدوده تحویل", "نشانی تحویل را", "اطلاعات سفارش کامل نیست");
+        assertThat(body).contains("نام و نام خانوادگی را وارد کنید", "شماره موبایل را", "محله یا محدوده تحویل", "نشانی تحویل را", "اطلاعات سفارش کامل نیست", "aria-invalid=\"true\"", "data-validation-summary", "aria-describedby=\"phone-help phone-error\"");
         retained();
         invalid = fields(); invalid.put("customerName", "ن".repeat(161)); invalid.put("deliveryArea", "م".repeat(161));
         invalid.put("deliveryAddress", "آ".repeat(1001)); invalid.put("customerNote", "ی".repeat(1001));

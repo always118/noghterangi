@@ -16,7 +16,7 @@
                 <label for="catalog-category" class="form-label">دسته‌بندی</label>
                 <select id="catalog-category" name="category" class="form-select">
                     <option value="">همه دسته‌بندی‌ها</option>
-                    <option th:each="category : ${activeCategories}" th:value="${category.slug}" th:text="${category.name}" th:selected="${category.slug == filter.category}"></option>
+                    <option th:each="category : ${activeCategories}" th:value="${category.slug}" th:text="${category.parent != null ? category.parent.name + ' / ' + category.name : category.name}" th:selected="${category.slug == filter.category}"></option>
                 </select>
             </div>
             <div class="col-6 col-md-3">
@@ -48,11 +48,12 @@
     <div th:if="${!#lists.isEmpty(filter.messages)}" class="alert alert-warning" role="alert">
         <p class="mb-1" th:each="message : ${filter.messages}" th:text="${message}"></p>
     </div>
-    <p class="text-muted" th:text="${products.totalElements} + ' محصول'"></p>
-    <div th:if="${products.empty}" class="alert alert-info" id="catalog-empty">
+    <h2 class="h5" id="catalog-results">نتیجهٔ جست‌وجو</h2>
+    <p class="text-muted" role="status"><span th:text="${products.totalElements} + ' محصول'"></span><th:block th:if="${!#strings.isEmpty(filter.q)}"> برای «<bdi th:text="${filter.q}"></bdi>»</th:block></p>
+    <div th:if="${products.empty}" class="alert alert-info" id="catalog-empty" role="status">
         <p>محصولی با این مشخصات پیدا نشد.</p>
-        <a th:href="@{/products}" class="alert-link">مشاهده همه محصولات</a>
-        <a th:if="${filter.page > 0}" th:href="${firstUrl}" class="alert-link d-block mt-2">صفحه اول همین جست‌وجو</a>
+        <a th:href="@{/products}" class="alert-link touch-link">مشاهده همه محصولات</a>
+        <a th:if="${filter.page > 0}" th:href="${firstUrl}" class="alert-link touch-link d-block mt-2">صفحه اول همین جست‌وجو</a>
     </div>
     <ul class="row g-3 list-unstyled" th:unless="${products.empty}" aria-label="محصولات">
         <li class="col-6 col-md-4 col-xl-3" th:each="product : ${products.content}">

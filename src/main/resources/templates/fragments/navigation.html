@@ -1,32 +1,25 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org">
 <body>
-<nav th:fragment="navigation" class="navbar navbar-expand-md py-3" aria-label="منوی اصلی">
-    <a class="navbar-brand brand d-flex align-items-center gap-2" th:href="@{/}">
+<nav th:fragment="navigation" class="navbar navbar-expand-lg public-navigation py-3" aria-label="منوی اصلی">
+    <a class="navbar-brand brand d-flex align-items-center gap-2" th:href="@{/}" aria-label="نقطه رنگی، خانه">
         <img class="brand-logo" th:src="@{/images/brand-logo.jpg}" alt="" width="44" height="44">نقطه رنگی
     </a>
+    <a class="nav-cart nav-link text-nowrap order-lg-last" th:href="@{/cart}">سبد خرید <span id="cart-count" class="badge" aria-label="تعداد کل کالاها" th:text="${cartCount}">0</span></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navigation"
             aria-controls="main-navigation" aria-expanded="false" aria-label="باز و بسته کردن منو">
         <span class="navbar-toggler-icon" aria-hidden="true"></span>
     </button>
     <div class="collapse navbar-collapse" id="main-navigation">
-        <ul class="navbar-nav ms-auto gap-md-3">
+        <ul class="navbar-nav ms-auto gap-lg-3">
+            <li class="nav-item"><a class="nav-link" th:href="@{/}">خانه</a></li>
             <li class="nav-item"><a class="nav-link" th:href="@{/products}">محصولات</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/#categories}">دنیای رنگی ما</a></li>
-            <li class="nav-item" th:if="${activeCategories != null and !#lists.isEmpty(activeCategories)}">
-                <details>
-                    <summary class="nav-link">دسته‌بندی‌ها</summary>
-                    <ul class="list-unstyled ps-3">
-                        <li th:each="category : ${activeCategories}">
-                            <a class="nav-link text-break" th:href="@{/products(category=${category.slug})}" th:text="${category.name}"></a>
-                        </li>
-                    </ul>
-                </details>
-            </li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/#categories}">دسته‌بندی‌ها</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/products#catalog-q}">جست‌وجو</a></li>
             <li class="nav-item"><a class="nav-link" th:href="@{/#about}">درباره نقطه رنگی</a></li>
         </ul>
-        <a class="nav-link ms-md-3 text-nowrap" th:href="@{/cart}">سبد خرید <span id="cart-count" class="badge bg-primary" aria-label="تعداد کل کالاها" th:text="${cartCount}">0</span></a>
     </div>
+    <noscript><style>.public-navigation .navbar-collapse { display: block; } .public-navigation .navbar-toggler { display: none; }</style></noscript>
 </nav>
 </body>
 </html>

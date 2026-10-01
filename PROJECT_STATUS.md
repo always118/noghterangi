@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 13 — Real Homepage
+Phase 14 — UX Polish
 
 Status: DONE
 
@@ -22,6 +22,7 @@ Status: DONE
 - Phase 11 — Checkout and Orders
 - Phase 12 — Admin Orders
 - Phase 13 — Real Homepage
+- Phase 14 — UX Polish
 
 Note:
 Phase 5 Categories was implemented before Phase 4 because the project
@@ -30,12 +31,12 @@ Admin Security now protects the existing category routes and future admin routes
 
 ## Current Work
 
-Phase 13 completed: database-driven homepage with approved branding and reviewed supplied development products.
-Original logo/photos are preserved. User explicitly authorized sample prices for the visual preview.
+Phase 14 completed: public mobile navigation, search feedback, product/card hierarchy,
+RTL, accessible controls and checkout/confirmation presentation refined. Business data is unchanged.
 
 ## Next Phase
 
-Phase 14 — UX Polish (NOT_STARTED; explicit approval required)
+Phase 15 — Docker (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
@@ -60,6 +61,8 @@ Phase 14 — UX Polish (NOT_STARTED; explicit approval required)
 - Public product catalog with PostgreSQL search/filter/sort and Spring Data pagination
 - Public product detail by slug with gallery, breadcrumbs, and friendly 404
 - Anonymous HTTP-session cart with product-detail add, quantity controls, subtotal, and navigation badge
+- Persistent mobile cart link, keyboard/Escape menu with no-JavaScript fallback, consistent public form controls
+- Accessible checkout errors/focus, compact expandable item summary, readable isolated order/payment numbers
 - Guest checkout and persistent orders with historical name/price snapshots (Flyway V7)
 - Session-restricted order confirmation and environment-configured card-to-card instructions
 - Protected admin order list/detail, status filter, 20-row pagination, and explicit fulfillment/cancellation actions
@@ -124,30 +127,35 @@ Phase 14 — UX Polish (NOT_STARTED; explicit approval required)
 
 ## Last Verification
 
-- Final Java 21 `mvn clean verify` PASSED: 96 tests, 0 failures/errors/skipped (2026-09-30).
-- New homepage tests verify anonymous access, active root categories, bounded/stable newest ordering,
-  active product/category visibility, optional featured/game sections, links/search and shared image/placeholder cards.
-- Import tests verify opt-in/profile guards (including mixed dev + production), repeat/no-overwrite behavior,
-  category conflicts, duplicate manifest keys, bad prices, missing/corrupt/traversal images and per-product rollback.
-- Packaged app started twice in dev mode against PostgreSQL; Flyway V1–V7 and Hibernate validation passed.
-- First run imported 15 products, 17 media and four categories. Second run created zero rows/images and retained all 15 products.
-  Reports: dev-data/import-report-first-run.md and dev-data/import-report.md; source decisions: dev-data/data-review.md.
-- Real-data Chromium checks passed: /, /health, /products, all 15 product details, all 17 media endpoints,
-  four pictured categories, eight newest cards, three featured cards, hidden empty game section, search,
-  category/product links, zero cart badge and unavailable products. Import report URL returned 404.
-- Homepage at 360/768/1440px: Persian RTL, no horizontal overflow, loaded photos and touch-size search controls.
-  Supplied-photo contact sheet and responsive screenshots reviewed. Unsupported hero emoji glyphs removed;
-  final screenshots refreshed in dev-data/verification/ after the final successful build and browser checks.
-- Browser regressions passed: admin login/logout, category/product CRUD and activation, image upload/order/removal,
-  catalog search/filter/sort/pagination, product detail/gallery, cart lifecycle and no-JavaScript cart,
-  checkout validation/failures/snapshots/session privacy, and admin order filtering/paging/status/cancellation.
-- Temporary board-game fixtures verified the nonempty homepage game section. Full order status progression,
-  cancellation/retry and database inventory assertions passed; all relevant views fit 360/768/1440px.
-- Temporary 23 orders/items, 20 test products (one deleted during failure verification), four categories,
-  test media and verification credentials removed; server stopped. The supplied development catalog remains:
-  15 products, 17 media, four categories, zero stock and zero orders.
-- Phase 13 DONE. Phase 14 NOT_STARTED. No automatic commit.
+- Final Java 21 `mvn clean verify` PASSED: 96 tests, 0 failures/errors/skipped (2026-10-01).
+- Existing tests extended for public search/navigation routes, parent/child category labels,
+  retained catalog query state and checkout error associations. Security and business regressions passed.
+- Packaged app started with the development importer disabled; PostgreSQL, Flyway V1–V7 and Hibernate validation passed.
+- Real imported catalog: homepage, catalog, pictured/unpictured detail, empty cart, no-results and 404 pages
+  checked in Chromium at 360/768/1440px. No horizontal overflow, broken photos or browser script errors.
+- Mobile cart stays visible; menu Enter/Escape (including rapid Escape while opening), focus return,
+  category-anchor focus, skip link, search/reset/empty query and category links passed. No-JavaScript navigation passed.
+- Complete Home → Search → List → Detail → Cart → Checkout → Confirmation flow passed using temporary
+  test inventory because all 15 real imported products remain unavailable. No real inventory was changed.
+- Cart live price/stock/unavailable/missing states, quantity controls, CSRF and no-JavaScript operations passed.
+  Checkout labels/keyboards, field errors/aria-invalid, focused error summary, expandable item details and
+  mobile total-before-form order passed. Confirmation numbers/payment, session privacy and 404 passed.
+- Admin login/logout, category/product activation/editing, media upload/order/removal, order paging/filter/status,
+  full fulfillment flow, cancellation/retry and database stock restoration assertions passed.
+- Cart, checkout, confirmation, detail and admin order pages also fit 360/768/1440px. Representative screenshots
+  visually reviewed; final captures and report are in dev-data/verification/phase14/.
+- Availability-label contrast measured at 8.29:1 (available) and 4.92:1 (unavailable) against their background.
+  This is a targeted accessibility review, not a claim of a formal whole-site conformance audit.
+- Performance: removed unused demo styles/redundant navigation, kept existing lazy images/batched queries;
+  category parents fetched in the active-category query to avoid lazy queries for the new labels.
+  New progressive-enhancement JavaScript is small; no new dependency, asset copy, framework or migration.
+- The browser pagination check initially read a partially parsed page; awaiting the expected card count fixed
+  the verification race. Rapid Escape during Bootstrap opening was an actual UX issue and was corrected.
+- Temporary test products/categories/media/orders and credentials removed; verification server stopped.
+  Remaining development data: 15 products, 17 media, four categories, zero orders. Before/after fingerprints
+  of imported product/category/media rows match; all 17 stored photos still match reviewed source bytes.
+- Phase 14 DONE. Phase 15 NOT_STARTED. No automatic commit.
 
 ## Last Updated
 
-2026-09-30
+2026-10-01
