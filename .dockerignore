@@ -1,0 +1,12 @@
+.git/
+.idea/
+.vscode/
+target/
+logs/
+uploads/
+*.log
+.env
+.env.*
+!.env.example
+*.zip
+*.class

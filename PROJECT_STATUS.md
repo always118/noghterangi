@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 14 — UX Polish
+Phase 15 — Docker
 
 Status: DONE
 
@@ -34,9 +34,13 @@ Admin Security now protects the existing category routes and future admin routes
 Phase 14 completed: public mobile navigation, search feedback, product/card hierarchy,
 RTL, accessible controls and checkout/confirmation presentation refined. Business data is unchanged.
 
+Phase 15 completed: PostgreSQL and Spring Boot run through Compose with a Java 21 multi-stage
+image, external environment configuration, health-gated startup, Flyway validation, and
+persistent database/media volumes.
+
 ## Next Phase
 
-Phase 15 — Docker (NOT_STARTED; explicit approval required)
+Phase 16 — Full V1 Testing (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
@@ -154,7 +158,15 @@ Phase 15 — Docker (NOT_STARTED; explicit approval required)
 - Temporary test products/categories/media/orders and credentials removed; verification server stopped.
   Remaining development data: 15 products, 17 media, four categories, zero orders. Before/after fingerprints
   of imported product/category/media rows match; all 17 stored photos still match reviewed source bytes.
-- Phase 14 DONE. Phase 15 NOT_STARTED. No automatic commit.
+- Docker image built and verified with Java 21 inside the runtime image; final process runs as
+  non-root `appuser` and writes to the named media volume.
+- Compose stack validated with PostgreSQL health-gated app startup; Flyway validated all 7
+  migrations, Hibernate validation passed, and `/health`, `/`, and `/products` returned HTTP 200.
+- Normal app restart and app-container recreation preserved health, database product count, and
+  a media-volume persistence marker; named `postgres-data` and `media-data` volumes were retained.
+- `mvn clean verify` passed with 96 tests. Temporary Docker verification credentials/files were
+  removed; no production values were added to source, Dockerfile, Compose, or README.
+- Phase 15 DONE. Phase 16 NOT_STARTED. No automatic commit.
 
 ## Last Updated
 

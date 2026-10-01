@@ -63,6 +63,36 @@ If you change a Compose host port, update the corresponding JDBC URL too.
 Compose uses fixed local database/user names as listed above. When connecting
 to an externally provisioned database, supply its JDBC URL and credentials.
 
+## Run the complete Docker stack
+
+Prerequisites are Docker Engine/Desktop and Docker Compose v2. Copy `.env.example`
+to `.env`, set the required local passwords, administrator BCrypt hash, and payment
+instructions, then start both PostgreSQL and the application:
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+The application is available at `http://localhost:8080`; check `/health` and `/products`.
+The app connects to PostgreSQL through the Compose service name and runs Flyway before
+Hibernate validation. `postgres-data` preserves database data and `media-data` preserves
+uploaded images across restarts, recreation, and `docker compose down`.
+
+Useful commands:
+
+```bash
+docker compose up -d
+docker compose ps
+docker compose logs -f app
+docker compose down
+docker compose up -d --build app
+```
+
+`docker compose down -v` deletes the persistent database and media volumes; use it only
+when deliberately removing local data. The normal container image does not include the
+development importer or development database data.
+
 ## Start PostgreSQL
 
 ```bash

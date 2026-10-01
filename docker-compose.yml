@@ -1,4 +1,4 @@
-# Local development only. The application runs with Maven or java -jar for now.
+# Local development and deployment baseline. Secrets stay in the untracked .env file.
 services:
   postgres:
     image: postgres:16.15-bookworm
@@ -17,6 +17,29 @@ services:
       timeout: 5s
       retries: 12
       start_period: 10s
+
+  app:
+    build:
+      context: .
+    env_file:
+      - ${APP_ENV_FILE:-.env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/noghterangi
+      DB_USERNAME: ${DB_USERNAME:-noghterangi}
+      MEDIA_STORAGE_PATH: /app/data/media
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    volumes:
+      - media-data:/app/data/media
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
 
   postgres-test:
     image: postgres:16.15-bookworm
@@ -39,3 +62,4 @@ services:
 
 volumes:
   postgres-data:
+  media-data:
