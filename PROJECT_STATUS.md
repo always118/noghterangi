@@ -41,7 +41,8 @@ persistent database/media volumes.
 Phase 16 completed: full automated V1 regression coverage and Docker runtime verification passed;
 no source or business-behavior fixes were required.
 
-Phase 17 in progress: replacing the application typography with locally hosted Vazirmatn web fonts.
+Phase 17 in progress: replacing application typography with locally hosted Vazirmatn web fonts and
+adding a lightweight client-side editor for product-image crop, resize, and JPEG compression.
 
 ## Next Phase
 
