@@ -19,5 +19,5 @@
 | 14 | UX Polish | DONE | Persistent mobile cart, keyboard/no-JS navigation, accessible forms, RTL cards and compact checkout; Java 21 mvn clean verify (96 tests); real-data and full journey/admin regressions at 360/768/1440px passed; imported data/photos unchanged |
 | 15 | Docker | DONE | Java 21 multi-stage image; Compose app/PostgreSQL stack; health, Flyway V1–V7, endpoint, restart, recreate, and named-volume persistence checks passed |
 | 16 | Full V1 Testing | DONE | Java 21 Maven suite: 96 tests passed; Docker stack, public routes, search/detail, restart/recreate, Flyway, persistence, security, and existing customer/admin/order regression coverage passed |
-| 17 | V1 Release Preparation | IN_PROGRESS | Vazirmatn typography and product-image crop/compression in progress |
-| 18 | Content Module / V1.1 | NOT_STARTED | — |
+| 17 | V1 Release Preparation | DONE | Shared local Cropper.js editor for product/category image crop and compression; category media V8 migration; Java 21 `mvn clean verify` (98 tests) passed; Docker rebuild and in-container `/health` check passed |
+| 18 | Homepage Category UX | IN_PROGRESS | Category section redesign in progress; verification pending |

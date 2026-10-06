@@ -1,15 +1,18 @@
 (() => {
     'use strict';
 
-    const form = document.querySelector('form[enctype="multipart/form-data"]');
-    const input = document.querySelector('#files');
-    const editor = document.querySelector('#product-image-editor');
+    const form = document.querySelector('[data-image-editor-form]');
+    const input = form?.querySelector('input[type="file"]');
+    const editor = document.querySelector('#image-editor');
     if (!form || !input || !editor || typeof Cropper === 'undefined') return;
 
     const image = document.querySelector('#image-editor-image');
     const preview = document.querySelector('#image-editor-preview');
     const progress = document.querySelector('#image-editor-progress');
-    const target = { width: 1200, height: 1500 };
+    const target = { width: Number(form.dataset.editorWidth), height: Number(form.dataset.editorHeight) };
+    const maxFiles = Number(form.dataset.editorMaxFiles || 1);
+    const kind = form.dataset.editorKind === 'category' ? 'category' : 'product';
+    editor.dataset.editorKind = kind;
     let cropper;
     let objectUrl;
     let files = [];
@@ -47,7 +50,7 @@
         destroyCropper();
         const file = files[currentIndex];
         if (!file) return;
-        progress.textContent = `تصویر ${currentIndex + 1} از ${files.length}`;
+        progress.textContent = files.length > 1 ? `تصویر ${currentIndex + 1} از ${files.length}` : '';
         objectUrl = URL.createObjectURL(file);
         image.onload = () => {
             cropper = new Cropper(image, {
@@ -65,11 +68,17 @@
             });
         };
         image.src = objectUrl;
+        const title = document.querySelector('#image-editor-title');
+        const help = document.querySelector('#image-editor-help');
+        title.textContent = kind === 'category' ? 'برش تصویر دسته‌بندی' : 'برش تصویر محصول';
+        help.textContent = kind === 'category'
+            ? 'برش ۳:۲؛ تصویر را جابه‌جا یا با لمس/چرخ ماوس بزرگ‌نمایی کنید.'
+            : 'برش ۴:۵؛ تصویر را جابه‌جا یا با لمس/چرخ ماوس بزرگ‌نمایی کنید.';
         show();
     };
     const baseName = (name, index) => {
         const base = name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9\u0600-\u06ff_-]+/g, '-').replace(/^-+|-+$/g, '');
-        return `${base || 'product-image'}-${index + 1}.jpg`;
+        return `${base || kind + '-image'}-${index + 1}.jpg`;
     };
     const replaceInputFiles = () => {
         const transfer = new DataTransfer();
@@ -82,11 +91,9 @@
         const file = files[currentIndex];
         const data = cropper.getData(true);
         const scale = Math.min(1, target.width / data.width, target.height / data.height);
-        const width = Math.max(1, Math.round(data.width * scale));
-        const height = Math.max(1, Math.round(data.height * scale));
         const canvas = cropper.getCroppedCanvas({
-            width,
-            height,
+            width: Math.max(1, Math.round(data.width * scale)),
+            height: Math.max(1, Math.round(data.height * scale)),
             fillColor: '#ffffff',
             imageSmoothingEnabled: true,
             imageSmoothingQuality: 'high'
@@ -95,14 +102,10 @@
         canvas.toBlob(blob => {
             if (!blob) return;
             processed.push(new File([blob], baseName(file.name, currentIndex), {
-                type: 'image/jpeg',
-                lastModified: Date.now()
+                type: 'image/jpeg', lastModified: Date.now()
             }));
             currentIndex += 1;
-            if (currentIndex < files.length) {
-                openCurrent();
-                return;
-            }
+            if (currentIndex < files.length) { openCurrent(); return; }
             replaceInputFiles();
             destroyCropper();
             hide();
@@ -111,8 +114,8 @@
     };
     const start = () => {
         if (!input.files.length) return;
-        if (input.files.length > 10) {
-            input.setCustomValidity('در هر بار حداکثر ۱۰ تصویر انتخاب کنید.');
+        if (input.files.length > maxFiles) {
+            input.setCustomValidity(`حداکثر ${maxFiles} تصویر انتخاب کنید.`);
             input.reportValidity();
             input.setCustomValidity('');
             return;

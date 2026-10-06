@@ -35,29 +35,35 @@
         </div>
     </section>
 
-    <section id="categories" class="mb-5" aria-labelledby="categories-title">
-        <p class="eyebrow">از اینجا شروع کن</p>
-        <h2 id="categories-title" class="section-title mb-3">دنیای رنگی ما</h2>
+    <section id="categories" class="home-categories mb-4" aria-labelledby="categories-title">
+        <p class="eyebrow mb-1">از اینجا شروع کن</p>
+        <h2 id="categories-title" class="section-title home-categories__title mb-4">دنیای رنگی ما</h2>
         <p th:if="${#lists.isEmpty(activeCategories)}" class="text-muted">دسته‌بندی‌ها به‌زودی اضافه می‌شوند.</p>
-        <div class="row g-3">
-            <div class="col-6 col-lg-3" th:each="category, item : ${activeCategories}">
-                <article class="category-card home-category text-break" th:id="'category-' + ${category.slug}"
-                         th:classappend="${ {'tone-mint', 'tone-peach', 'tone-lilac', 'tone-sand'}[item.index % 4]}">
-                    <a th:href="@{/products(category=${category.slug})}" class="home-category-link">
-                        <img th:if="${categoryImages[category.name] != null}" th:src="@{/images/categories/{file}(file=${categoryImages[category.name]})}" alt="" width="280" height="160" loading="lazy">
-                        <span th:unless="${categoryImages[category.name] != null}" class="category-symbol" aria-hidden="true">✦</span>
-                        <h3 class="h6 mb-0" th:text="${category.name}"></h3>
-                    </a>
-                    <p class="small mt-2 mb-0" th:if="${!#strings.isEmpty(category.description)}" th:text="${category.description}"></p>
-                </article>
+        <div class="row g-3 g-lg-4">
+            <div class="col-12 col-sm-6 col-lg-3" th:each="category, item : ${activeCategories}">
+                <a th:id="'category-' + ${category.slug}" th:href="@{/products(category=${category.slug})}"
+                   class="home-category-card text-break"
+                   th:classappend="${ {'tone-mint', 'tone-peach', 'tone-lilac', 'tone-sand'}[item.index % 4]}">
+                    <span class="home-category-card__media">
+                        <img th:if="${home.categoryImages[category.id] != null}"
+                             th:src="@{/media/{id}(id=${home.categoryImages[category.id]})}"
+                             th:alt="${category.name}" width="1200" height="800" loading="lazy">
+                        <span th:unless="${home.categoryImages[category.id] != null}"
+                              class="home-category-card__placeholder" aria-hidden="true">✦</span>
+                    </span>
+                    <span class="home-category-card__footer">
+                        <span class="home-category-card__name" th:text="${category.name}"></span>
+                        <span class="home-category-card__arrow" aria-hidden="true">←</span>
+                    </span>
+                </a>
             </div>
         </div>
+        <a class="home-categories__all" th:href="@{/products}">همهٔ محصولات <span aria-hidden="true">←</span></a>
     </section>
 
     <section id="new-products" class="mb-5" aria-labelledby="new-products-title">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
             <h2 id="new-products-title" class="section-title mb-0">تازه‌های نقطه رنگی</h2>
-            <a th:href="@{/products(sort=NEWEST)}">همهٔ محصولات <span aria-hidden="true">←</span></a>
         </div>
         <p th:if="${#lists.isEmpty(home.newest)}" class="text-muted">محصولات به‌زودی اضافه می‌شوند.</p>
         <div class="row g-3 g-md-4">

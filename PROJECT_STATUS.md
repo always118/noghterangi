@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 17 — V1 Release Preparation
+Phase 18 — Homepage Category UX
 
 Status: IN_PROGRESS
 
@@ -41,8 +41,10 @@ persistent database/media volumes.
 Phase 16 completed: full automated V1 regression coverage and Docker runtime verification passed;
 no source or business-behavior fixes were required.
 
-Phase 17 in progress: replacing application typography with locally hosted Vazirmatn web fonts and
-adding a lightweight client-side editor for product-image crop, resize, and JPEG compression.
+Phase 17 completed: shared local Cropper.js image editor and category media support passed the full
+Java 21 test suite and Docker health verification.
+
+Phase 18 in progress: redesigning only the homepage category section and its surrounding spacing.
 
 ## Next Phase
 
@@ -181,9 +183,9 @@ Phase 18 — Content Module / V1.1 (NOT_STARTED; explicit approval required)
 - Existing integration coverage passed for the full customer journey, cart/checkout/order snapshots,
   admin categories/products/media/orders, fulfillment/cancellation/restock concurrency, CSRF, input
   validation, inactive/missing products, upload safety, and development-data isolation.
-- No application bugs were found; no source files were changed. Phase 16 DONE. Phase 17 NOT_STARTED.
+- Phase 17 completed: shared local Cropper.js image editor, product/category crop-compression flow, category media management, homepage category images, and Flyway V8 are implemented. Java 21 `mvn clean verify` passed with 98 tests; Docker rebuild and in-container `/health` check passed. No automatic commit.
 - `.env` remained ignored and untracked. No automatic commit.
 
 ## Last Updated
 
-2026-10-02
+2026-10-06

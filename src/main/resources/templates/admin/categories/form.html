@@ -43,10 +43,30 @@
                 <input id="active" class="form-check-input" type="checkbox" th:field="*{active}">
                 <label for="active" class="form-check-label">فعال و قابل نمایش در صفحه اصلی و منو</label>
             </div>
-            <div class="d-flex flex-wrap gap-2">
+            <div class="d-flex flex-wrap gap-2 mt-4">
                 <button class="btn btn-primary" type="submit">ذخیره دسته‌بندی</button>
                 <a class="btn btn-outline-secondary" th:href="@{/admin/categories}">بازگشت به فهرست</a>
             </div>
+        </form>
+        <form th:if="${categoryId != null}" method="post" enctype="multipart/form-data"
+              th:action="@{/admin/categories/{id}/image(id=${categoryId})}"
+              data-image-editor-form data-editor-kind="category" data-editor-width="1200"
+              data-editor-height="800" data-editor-max-files="1">
+            <div class="border rounded p-3 mt-4 mb-4">
+                <h2 class="h5">تصویر دسته‌بندی</h2>
+                <img th:if="${categoryImage != null}" class="category-image-preview mb-3"
+                     th:src="@{/media/{id}(id=${categoryImage.id})}" alt="تصویر فعلی دسته‌بندی">
+                <p th:if="${categoryImage == null}" class="text-muted small">تصویری برای این دسته‌بندی ثبت نشده است.</p>
+                <label for="category-image" class="form-label">انتخاب تصویر</label>
+                <input id="category-image" name="image" type="file" class="form-control"
+                       accept="image/jpeg,image/png,.jpg,.jpeg,.png" aria-describedby="category-image-help">
+                <p id="category-image-help" class="form-text">تصویر پس از برش ۳:۲ و فشرده‌سازی با اندازه حداکثر ۱۲۰۰×۸۰۰ ذخیره می‌شود.</p>
+                <div th:replace="~{fragments/image-editor :: image-editor}"></div>
+            </div>
+        </form>
+        <form th:if="${categoryId != null && categoryImage != null}" method="post"
+              th:action="@{/admin/categories/{id}/image/delete(id=${categoryId},_csrf=${_csrf.token})}">
+            <button type="submit" class="btn btn-outline-danger mt-2">حذف تصویر</button>
         </form>
     </div></div>
 </section></body>

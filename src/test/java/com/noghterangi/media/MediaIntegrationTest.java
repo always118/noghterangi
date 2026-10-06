@@ -55,7 +55,47 @@ class MediaIntegrationTest {
             service.images(id).forEach(image -> service.delete(id, image.getId()));
             productRepository.deleteById(id);
         }
+        if (categoryId != null) {
+            service.categoryImage(categoryId).ifPresent(image -> service.deleteCategoryImage(categoryId));
+        }
         categoryRepository.deleteById(categoryId);
+    }
+
+    @Test void categoryImageCanBeReplacedAndRemovedThroughSharedMediaStorage() throws Exception {
+        var first = ImageFixtures.image("jpeg");
+        service.replaceCategoryImage(categoryId, first);
+        var stored = service.categoryImage(categoryId).orElseThrow();
+        assertThat(stored.getCategory().getId()).isEqualTo(categoryId);
+        assertThat(stored.getProduct()).isNull();
+        assertThat(service.content(stored.getId()).bytes()).isEqualTo(first.getBytes());
+        var oldName = stored.getStoredFileName();
+
+        service.replaceCategoryImage(categoryId, ImageFixtures.image("png"));
+        var replacement = service.categoryImage(categoryId).orElseThrow();
+        assertThat(replacement.getId()).isNotEqualTo(stored.getId());
+        assertThat(Path.of(storagePath, oldName)).doesNotExist();
+        assertThat(service.content(replacement.getId()).contentType()).isEqualTo("image/png");
+
+        service.deleteCategoryImage(categoryId);
+        assertThat(service.categoryImage(categoryId)).isEmpty();
+        assertThat(Path.of(storagePath, replacement.getStoredFileName())).doesNotExist();
+    }
+
+    @Test void categoryImageHttpFlowKeepsAdminProtectionCsrfAndHomepagePlaceholderBehavior() throws Exception {
+        String editPath = "/admin/categories/" + categoryId + "/edit";
+        var image = ImageFixtures.image("jpeg");
+        assertThat(browser.get(editPath).statusCode()).isEqualTo(302);
+        browser.login();
+        assertThat(browser.get(editPath).body()).contains("تصویر دسته‌بندی", "برش تصویر");
+        assertThat(browser.upload(editPath, null, "image", List.of(image)).statusCode()).isEqualTo(403);
+        String updatePath = "/admin/categories/" + categoryId + "/image";
+        assertThat(browser.upload(updatePath, TestBrowser.csrf(browser.get(editPath).body()), "image", List.of(image)).statusCode()).isEqualTo(302);
+        var stored = service.categoryImage(categoryId).orElseThrow();
+        assertThat(browser.get("/").body()).contains("/media/" + stored.getId());
+        String deletePath = "/admin/categories/" + categoryId + "/image/delete";
+        assertThat(browser.post(deletePath, Map.of()).statusCode()).isEqualTo(403);
+        assertThat(browser.postWithCsrf(editPath, deletePath, Map.of()).statusCode()).isEqualTo(302);
+        assertThat(browser.get("/").body()).doesNotContain("/media/" + stored.getId());
     }
 
     @Test void multipleImagesBelongToProductAndOrderingSelectsPrimary() throws Exception {

@@ -12,6 +12,7 @@
     </div>
     <!-- Query token supports multipart CSRF verification without a pre-security upload filter. -->
     <form class="border rounded p-3 mb-4" method="post" enctype="multipart/form-data"
+          data-image-editor-form data-editor-kind="product" data-editor-width="1200" data-editor-height="1500" data-editor-max-files="10"
           th:action="@{/admin/products/{id}/images(id=${product.id},_csrf=${_csrf.token})}">
         <label for="files" class="form-label">انتخاب تصاویر JPEG یا PNG</label>
         <input class="form-control" id="files" name="files" type="file" multiple required
@@ -19,36 +20,7 @@
         <p class="form-text" id="upload-help">در هر بار ۱ تا ۱۰ تصویر؛ حداکثر ۵ مگابایت، ۱۰ میلیون پیکسل و ۸۱۹۲ پیکسل در هر ضلع. WebP و SVG پشتیبانی نمی‌شوند.</p>
         <button type="submit" class="btn btn-primary">بارگذاری تصاویر</button>
     </form>
-    <div id="product-image-editor" class="image-editor" hidden role="dialog" aria-modal="true"
-         aria-labelledby="image-editor-title" aria-describedby="image-editor-help">
-        <div class="image-editor__panel">
-            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-                <div>
-                    <h2 id="image-editor-title" class="h5 mb-1">برش تصویر محصول</h2>
-                    <p id="image-editor-help" class="small text-muted mb-0">نسبت تصویر ۴ به ۵ است. تصویر را جابه‌جا یا با لمس/چرخ ماوس بزرگ‌نمایی کنید.</p>
-                </div>
-                <button id="image-editor-cancel-top" type="button" class="btn btn-outline-secondary btn-sm">انصراف</button>
-            </div>
-            <div class="image-editor__workspace">
-                <div class="image-editor__canvas-wrap">
-                    <img id="image-editor-image" alt="پیش‌نمایش تصویر برای برش">
-                </div>
-                <div class="image-editor__preview-wrap">
-                    <span class="small text-muted">پیش‌نمایش نهایی</span>
-                    <img id="image-editor-preview" alt="پیش‌نمایش تصویر برش‌خورده">
-                    <span id="image-editor-progress" class="small text-muted" aria-live="polite"></span>
-                </div>
-            </div>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-                <button id="image-editor-zoom-out" type="button" class="btn btn-outline-secondary">کوچک‌نمایی</button>
-                <button id="image-editor-zoom-in" type="button" class="btn btn-outline-secondary">بزرگ‌نمایی</button>
-                <button id="image-editor-reset" type="button" class="btn btn-outline-secondary">بازنشانی</button>
-                <span class="flex-grow-1"></span>
-                <button id="image-editor-cancel" type="button" class="btn btn-outline-danger">لغو بارگذاری</button>
-                <button id="image-editor-confirm" type="button" class="btn btn-primary">تأیید و ادامه</button>
-            </div>
-        </div>
-    </div>
+    <div th:replace="~{fragments/image-editor :: image-editor}"></div>
     <p th:if="${#lists.isEmpty(images)}" class="alert alert-info">این محصول هنوز تصویری ندارد.</p>
     <ul class="list-unstyled row g-3">
         <li class="col-12 col-md-6 col-xl-4" th:each="image, state : ${images}">
@@ -69,9 +41,6 @@
             </article>
         </li>
     </ul>
-    <link rel="stylesheet" th:href="@{/vendor/cropperjs/cropper.min.css}">
-    <script th:src="@{/vendor/cropperjs/cropper.min.js}"></script>
-    <script th:src="@{/js/product-image-editor.js}"></script>
 </section>
 </body>
 </html>

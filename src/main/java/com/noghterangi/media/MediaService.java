@@ -1,6 +1,7 @@
 package com.noghterangi.media;
 
 import com.noghterangi.product.ProductService;
+import com.noghterangi.category.CategoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -20,9 +21,11 @@ public class MediaService {
     private final MediaRepository repository;
     private final MediaStorageService storage;
     private final ProductService products;
+    private final CategoryService categories;
 
-    public MediaService(MediaRepository repository, MediaStorageService storage, ProductService products) {
-        this.repository = repository; this.storage = storage; this.products = products;
+    public MediaService(MediaRepository repository, MediaStorageService storage, ProductService products,
+                        CategoryService categories) {
+        this.repository = repository; this.storage = storage; this.products = products; this.categories = categories;
     }
 
     public List<Media> images(Long productId) {
@@ -35,6 +38,21 @@ public class MediaService {
         if (!productIds.isEmpty()) {
             for (Media media : repository.findPrimaryImages(productIds)) {
                 result.putIfAbsent(media.getProduct().getId(), media.getId());
+            }
+        }
+        return result;
+    }
+
+    public Optional<Media> categoryImage(Long categoryId) {
+        categories.get(categoryId);
+        return repository.findFirstByCategoryId(categoryId);
+    }
+
+    public Map<Long, Long> primaryCategoryImages(List<Long> categoryIds) {
+        Map<Long, Long> result = new HashMap<>();
+        if (!categoryIds.isEmpty()) {
+            for (Media media : repository.findByCategoryIdIn(categoryIds)) {
+                result.put(media.getCategory().getId(), media.getId());
             }
         }
         return result;
@@ -63,6 +81,37 @@ public class MediaService {
             created.add(stored.storedFileName());
             repository.save(new Media(product, stored, (int) next++));
         }
+    }
+
+    @Transactional
+    public void replaceCategoryImage(Long categoryId, MultipartFile file) {
+        var category = categories.get(categoryId);
+        if (file == null || file.isEmpty()) {
+            throw new MediaStorageException("لطفاً یک تصویر انتخاب کنید.");
+        }
+        var previous = repository.findFirstByCategoryId(categoryId).orElse(null);
+        var stored = storage.store(file);
+        registerCreatedFileCleanup(stored.storedFileName());
+        if (previous != null) {
+            repository.delete(previous);
+            repository.flush();
+            String oldName = previous.getStoredFileName();
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override public void afterCommit() { deleteFileSafely(oldName); }
+            });
+        }
+        repository.save(new Media(category, stored));
+    }
+
+    @Transactional
+    public void deleteCategoryImage(Long categoryId) {
+        categories.get(categoryId);
+        Media image = repository.findFirstByCategoryId(categoryId).orElseThrow(this::missing);
+        repository.delete(image);
+        String name = image.getStoredFileName();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override public void afterCommit() { deleteFileSafely(name); }
+        });
     }
 
     @Transactional
@@ -97,5 +146,12 @@ public class MediaService {
             log.warn("Media file cleanup failed for generated file {}; manual cleanup required", name);
         }
     }
+    private void registerCreatedFileCleanup(String name) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override public void afterCompletion(int status) {
+                if (status != STATUS_COMMITTED) { deleteFileSafely(name); }
+                }
+            });
+        }
     public record ImageContent(String contentType, byte[] bytes) {}
 }

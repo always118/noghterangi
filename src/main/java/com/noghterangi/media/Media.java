@@ -1,6 +1,7 @@
 package com.noghterangi.media;
 
 import com.noghterangi.product.Product;
+import com.noghterangi.category.Category;
 import jakarta.persistence.*;
 import java.time.Instant;
 
@@ -21,9 +22,12 @@ public class Media {
     private Integer sortOrder;
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private Product product;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     protected Media() {}
     Media(Product product, MediaStorageService.StoredImage stored, int order) {
@@ -33,6 +37,14 @@ public class Media {
         contentType = stored.contentType();
         fileSize = stored.fileSize();
         sortOrder = order;
+    }
+    Media(Category category, MediaStorageService.StoredImage stored) {
+        this.category = category;
+        storedFileName = stored.storedFileName();
+        originalFileName = stored.originalFileName();
+        contentType = stored.contentType();
+        fileSize = stored.fileSize();
+        sortOrder = 0;
     }
     @PrePersist void onCreate() { createdAt = Instant.now(); }
     void setSortOrder(int sortOrder) { this.sortOrder = sortOrder; }
@@ -44,4 +56,5 @@ public class Media {
     public Integer getSortOrder() { return sortOrder; }
     public Instant getCreatedAt() { return createdAt; }
     public Product getProduct() { return product; }
+    public Category getCategory() { return category; }
 }

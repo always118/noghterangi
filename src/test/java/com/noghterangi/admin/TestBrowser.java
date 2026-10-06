@@ -48,10 +48,15 @@ public class TestBrowser implements AutoCloseable {
     }
 
     public HttpResponse<String> upload(String path, String csrf, java.util.List<org.springframework.mock.web.MockMultipartFile> files) throws Exception {
+        return upload(path, csrf, "files", files);
+    }
+
+    public HttpResponse<String> upload(String path, String csrf, String fieldName,
+                                       java.util.List<org.springframework.mock.web.MockMultipartFile> files) throws Exception {
         String boundary = "image-test-" + java.util.UUID.randomUUID();
         var body = new java.io.ByteArrayOutputStream();
         for (var file : files) {
-            body.write(("--" + boundary + "\r\nContent-Disposition: form-data; name=\"files\"; filename=\""
+            body.write(("--" + boundary + "\r\nContent-Disposition: form-data; name=\"" + fieldName + "\"; filename=\""
                     + file.getOriginalFilename() + "\"\r\nContent-Type: " + file.getContentType() + "\r\n\r\n")
                     .getBytes(StandardCharsets.UTF_8));
             body.write(file.getBytes()); body.write("\r\n".getBytes(StandardCharsets.UTF_8));

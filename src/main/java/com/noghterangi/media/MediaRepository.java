@@ -7,6 +7,9 @@ import java.util.Optional;
 
 public interface MediaRepository extends JpaRepository<Media, Long> {
     List<Media> findByProductIdOrderBySortOrderAscIdAsc(Long productId);
+    Optional<Media> findFirstByCategoryId(Long categoryId);
+    List<Media> findByCategoryIdIn(List<Long> categoryIds);
+    Optional<Media> findByIdAndCategoryId(Long id, Long categoryId);
     @Query("""
             select m from Media m where m.product.id in :productIds and not exists (
                 select earlier.id from Media earlier where earlier.product.id = m.product.id
