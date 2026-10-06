@@ -19,6 +19,13 @@
     let processed = [];
     let currentIndex = 0;
 
+    const outputSize = data => {
+        const scale = Math.min(1, target.width / data.width, target.height / data.height);
+        const width = Math.max(1, Math.floor(data.width * scale));
+        const height = Math.max(1, Math.round(width * target.height / target.width));
+        return { width, height };
+    };
+
     const show = () => { editor.hidden = false; document.body.classList.add('image-editor-open'); };
     const hide = () => { editor.hidden = true; document.body.classList.remove('image-editor-open'); };
     const destroyCropper = () => {
@@ -37,9 +44,10 @@
     };
     const updatePreview = () => {
         if (!cropper) return;
+        const size = outputSize(cropper.getData(true));
         const canvas = cropper.getCroppedCanvas({
-            maxWidth: target.width,
-            maxHeight: target.height,
+            width: size.width,
+            height: size.height,
             fillColor: '#ffffff',
             imageSmoothingEnabled: true,
             imageSmoothingQuality: 'high'
@@ -62,7 +70,9 @@
                 movable: true,
                 zoomable: true,
                 cropBoxMovable: true,
-                cropBoxResizable: true,
+                cropBoxResizable: false,
+                dragMode: 'move',
+                toggleDragModeOnDblclick: false,
                 ready: updatePreview,
                 cropend: updatePreview
             });
@@ -90,10 +100,10 @@
         if (!cropper) return;
         const file = files[currentIndex];
         const data = cropper.getData(true);
-        const scale = Math.min(1, target.width / data.width, target.height / data.height);
+        const size = outputSize(data);
         const canvas = cropper.getCroppedCanvas({
-            width: Math.max(1, Math.round(data.width * scale)),
-            height: Math.max(1, Math.round(data.height * scale)),
+            width: size.width,
+            height: size.height,
             fillColor: '#ffffff',
             imageSmoothingEnabled: true,
             imageSmoothingQuality: 'high'

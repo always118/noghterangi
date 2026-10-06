@@ -84,27 +84,26 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
 
 /* Product images preserve their proportions within the existing RTL cards. */
-.product-image { width: 100%; height: 12rem; object-fit: contain; background: var(--bs-tertiary-bg, #f8f9fa); border-radius: .5rem; }
+.product-image { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: contain; background: var(--bs-tertiary-bg, #f8f9fa); border-radius: .5rem; }
 .image-placeholder { display: flex; align-items: center; justify-content: center; color: var(--bs-secondary-color, #6c757d); }
 
 .catalog-filters { background: var(--bs-body-bg, #fff); }
 .catalog-filters summary { cursor: pointer; }
-.catalog-image { height: 11rem; background: #f8f9fa; overflow: hidden; }
+.catalog-image { aspect-ratio: 4 / 5; background: #f8f9fa; overflow: hidden; }
 .catalog-image img { width: 100%; height: 100%; object-fit: contain; }
 .catalog-image [hidden] { display: none !important; }
 .catalog-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; line-height: 1.7; }
 .catalog-price { overflow-wrap: anywhere; }
 @media (max-width: 575.98px) {
-    .catalog-image { height: 9rem; }
     .catalog-card .card-body { padding: .75rem; }
 }
 
 .product-description { white-space: pre-wrap; overflow-wrap: anywhere; }
 .product-detail { overflow-wrap: anywhere; }
 .quantity-input { max-width: 8rem; }
-.detail-main-image { height: min(70vw, 22rem); background: #f8f9fa; overflow: hidden; }
+.detail-main-image { width: min(100%, 28rem); aspect-ratio: 4 / 5; background: #f8f9fa; overflow: hidden; }
 .detail-main-image img { width: 100%; height: 100%; object-fit: contain; }
-.gallery-thumbnail { display: block; width: 80px; height: 64px; overflow: hidden; }
+.gallery-thumbnail { display: block; width: 64px; aspect-ratio: 4 / 5; overflow: hidden; }
 .gallery-thumbnail img { width: 100%; height: 100%; object-fit: contain; }
 .gallery-thumbnail[aria-current="true"] { outline: 2px solid var(--bs-primary); outline-offset: 2px; }
 .gallery-thumbnails { max-height: 10rem; overflow-y: auto; padding: .25rem; }
