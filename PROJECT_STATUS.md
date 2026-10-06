@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 16 — Full V1 Testing
+Phase 17 — V1 Release Preparation
 
 Status: IN_PROGRESS
 
@@ -41,9 +41,11 @@ persistent database/media volumes.
 Phase 16 completed: full automated V1 regression coverage and Docker runtime verification passed;
 no source or business-behavior fixes were required.
 
+Phase 17 in progress: replacing the application typography with locally hosted Vazirmatn web fonts.
+
 ## Next Phase
 
-Phase 17 — V1 Release Preparation (NOT_STARTED; explicit approval required)
+Phase 18 — Content Module / V1.1 (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
