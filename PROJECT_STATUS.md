@@ -2,9 +2,9 @@
 
 ## Current Phase
 
-Phase 15 — Docker
+Phase 16 — Full V1 Testing
 
-Status: DONE
+Status: IN_PROGRESS
 
 ## Completed Phases
 
@@ -38,9 +38,12 @@ Phase 15 completed: PostgreSQL and Spring Boot run through Compose with a Java 2
 image, external environment configuration, health-gated startup, Flyway validation, and
 persistent database/media volumes.
 
+Phase 16 completed: full automated V1 regression coverage and Docker runtime verification passed;
+no source or business-behavior fixes were required.
+
 ## Next Phase
 
-Phase 16 — Full V1 Testing (NOT_STARTED; explicit approval required)
+Phase 17 — V1 Release Preparation (NOT_STARTED; explicit approval required)
 
 ## Existing Foundation
 
@@ -94,7 +97,7 @@ Phase 16 — Full V1 Testing (NOT_STARTED; explicit approval required)
 - Configure ADMIN_USERNAME and ADMIN_PASSWORD_HASH before startup; no defaults.
 - One environment-configured admin; no registration, reset, or admin user table.
 - Set SESSION_COOKIE_SECURE=true for HTTPS; local HTTP defaults to false.
-- Java 21 is required. PostgreSQL runs in Compose; application not containerized.
+- Java 21 is required. PostgreSQL and the application run in Compose for Docker verification and local deployment.
 - Local images: MEDIA_STORAGE_PATH (default uploads/media), JPEG/PNG only; 5 MiB/file, 10 files/batch.
 - Filesystem/DB are not atomic; crashes or cleanup failures may leave orphan files (documented in README).
 - Catalog search is normalized substring matching on names; no full-text index or search engine.
@@ -166,8 +169,18 @@ Phase 16 — Full V1 Testing (NOT_STARTED; explicit approval required)
   a media-volume persistence marker; named `postgres-data` and `media-data` volumes were retained.
 - `mvn clean verify` passed with 96 tests. Temporary Docker verification credentials/files were
   removed; no production values were added to source, Dockerfile, Compose, or README.
-- Phase 15 DONE. Phase 16 NOT_STARTED. No automatic commit.
+- Phase 16 final Java 21 `mvn clean verify` PASSED: 96 tests, 0 failures/errors/skipped (2026-10-02).
+- Docker `compose config` and `compose up --build` passed with healthy PostgreSQL and app containers;
+  Flyway validated all 7 migrations and reported the schema up to date.
+- Docker `/health`, `/`, `/products`, public detail/404, Persian-normalized search, combined filters,
+  and anonymous admin protection passed. Product count remained 15 across restart and app recreation;
+  the named media volume survived recreation. The temporary verification stack was stopped without `-v`.
+- Existing integration coverage passed for the full customer journey, cart/checkout/order snapshots,
+  admin categories/products/media/orders, fulfillment/cancellation/restock concurrency, CSRF, input
+  validation, inactive/missing products, upload safety, and development-data isolation.
+- No application bugs were found; no source files were changed. Phase 16 DONE. Phase 17 NOT_STARTED.
+- `.env` remained ignored and untracked. No automatic commit.
 
 ## Last Updated
 
-2026-10-01
+2026-10-02
