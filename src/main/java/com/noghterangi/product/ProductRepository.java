@@ -15,6 +15,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     Page<Product> findAll(Specification<Product> specification, Pageable pageable);
     @EntityGraph(attributePaths = "category")
     List<Product> findAllByOrderByDisplayOrderAscIdAsc();
+    @EntityGraph(attributePaths = "category")
+    List<Product> findByCategoryIdOrderByDisplayOrderAscIdAsc(Long categoryId);
     @Override
     @EntityGraph(attributePaths = "category")
     Optional<Product> findById(Long id);

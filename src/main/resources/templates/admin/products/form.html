@@ -44,8 +44,15 @@
                         <select id="categoryId" class="form-select" th:field="*{categoryId}" required th:errorclass="is-invalid"
                                 th:aria-invalid="${#fields.hasErrors('categoryId')}" aria-describedby="categoryId-errors">
                             <option value="">انتخاب دسته‌بندی</option>
-                            <option th:each="category : ${categories}" th:value="${category.id}"
-                                    th:text="${category.name} + (${category.active} ? '' : ' (غیرفعال؛ دسته فعلی)')"></option>
+                            <optgroup th:each="parent : ${categoryParents}" th:if="${parent.parent == null}" th:label="${parent.name}">
+                                <option th:each="category : ${categories}" th:if="${category.id.equals(parent.id)}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name} + ' (دسته اصلی)' + (${category.active} ? '' : ' (غیرفعال؛ دسته فعلی)')"></option>
+                                <option th:each="category : ${categories}"
+                                        th:if="${category.parent != null and category.parent.id.equals(parent.id)}"
+                                        th:value="${category.id}"
+                                        th:text="'— ' + ${category.name} + (${category.active} ? '' : ' (غیرفعال؛ دسته فعلی)')"></option>
+                            </optgroup>
                         </select>
                         <div id="categoryId-errors" class="invalid-feedback" th:errors="*{categoryId}"></div>
                     </div>

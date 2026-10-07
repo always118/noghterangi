@@ -44,7 +44,8 @@ no source or business-behavior fixes were required.
 Phase 17 completed: shared local Cropper.js image editor and category media support passed the full
 Java 21 test suite and Docker health verification.
 
-Phase 18 in progress: redesigning only the homepage category section and its surrounding spacing.
+Phase 18 completed: final 8-root/49-child category catalog was entered through the existing admin services;
+15 products were reassigned without deletion and all eight prepared category images were uploaded through MediaService.
 
 ## Next Phase
 
@@ -184,8 +185,11 @@ Phase 18 — Content Module / V1.1 (NOT_STARTED; explicit approval required)
   admin categories/products/media/orders, fulfillment/cancellation/restock concurrency, CSRF, input
   validation, inactive/missing products, upload safety, and development-data isolation.
 - Phase 17 completed: shared local Cropper.js image editor, product/category crop-compression flow, category media management, homepage category images, and Flyway V8 are implemented. Java 21 `mvn clean verify` passed with 98 tests; Docker rebuild and in-container `/health` check passed. No automatic commit.
-- `.env` remained ignored and untracked. No automatic commit.
+- Phase 18 completed: no Flyway data-seed migration was added. The explicit dev-only catalog importer used
+  CategoryService, ProductService and MediaService; database verification found 8 active roots, 57 unique
+  categories, 15 products with no orphaned category relations, eight assigned images, and zero absolute media paths.
+  Java 21 `mvn clean verify` passed with 98 tests. No automatic commit.
 
 ## Last Updated
 
-2026-10-06
+2026-10-07

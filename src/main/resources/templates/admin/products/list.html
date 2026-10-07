@@ -9,6 +9,32 @@
         <a class="btn btn-primary" th:href="@{/admin/products/new}">محصول جدید</a>
     </div>
     <p class="text-muted">قیمت‌ها به تومان هستند. برای تغییر قیمت، موجودی و سایر مشخصات، محصول را ویرایش کنید.</p>
+    <form class="admin-category-filter bg-white border rounded-3 p-3 p-md-4 mb-4" method="get"
+          th:action="@{/admin/products}" aria-labelledby="product-category-filter-title">
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-lg-7">
+                <label id="product-category-filter-title" class="form-label" for="categoryFilter">فیلتر بر اساس دسته‌بندی</label>
+                <select id="categoryFilter" name="categoryId" class="form-select">
+                    <option value="" th:selected="${selectedCategoryId == null}">همهٔ دسته‌بندی‌ها</option>
+                    <optgroup th:each="parent : ${categoryOptions}" th:if="${parent.parent == null}" th:label="${parent.name}">
+                        <option th:value="${parent.id}"
+                                th:selected="${selectedCategoryId != null and selectedCategoryId.equals(parent.id)}"
+                                th:text="${parent.name} + ' (دسته اصلی)'"></option>
+                        <option th:each="category : ${categoryOptions}"
+                                th:if="${category.parent != null and category.parent.id.equals(parent.id)}"
+                                th:value="${category.id}"
+                                th:selected="${selectedCategoryId != null and selectedCategoryId.equals(category.id)}"
+                                th:text="'— ' + ${category.name}"></option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="col-12 col-lg-auto d-flex flex-wrap gap-2">
+                <button class="btn btn-primary" type="submit">اعمال فیلتر</button>
+                <a class="btn btn-outline-secondary" th:if="${selectedCategoryId != null}"
+                   th:href="@{/admin/products}">حذف فیلتر</a>
+            </div>
+        </div>
+    </form>
     <p th:if="${#lists.isEmpty(products)}" class="alert alert-info">هنوز محصولی ایجاد نشده است.</p>
     <ul class="list-unstyled row g-3" th:unless="${#lists.isEmpty(products)}">
         <li class="col-12 col-md-6 col-xl-4" th:each="product : ${products}">

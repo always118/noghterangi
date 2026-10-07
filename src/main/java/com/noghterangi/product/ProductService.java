@@ -27,6 +27,9 @@ public class ProductService {
     }
 
     public List<Product> findAll() { return repository.findAllByOrderByDisplayOrderAscIdAsc(); }
+    public List<Product> findAll(Long categoryId) {
+        return categoryId == null ? findAll() : repository.findByCategoryIdOrderByDisplayOrderAscIdAsc(categoryId);
+    }
     public Product get(Long id) {
         return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "محصول پیدا نشد."));
     }
@@ -44,6 +47,8 @@ public class ProductService {
         }
         return choices;
     }
+
+    public List<Category> categoryFilterChoices() { return categories.findAllByOrderByNameAscIdAsc(); }
 
     @Transactional
     public Product create(@Valid ProductForm form) {

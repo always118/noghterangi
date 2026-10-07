@@ -19,6 +19,7 @@ public class CategoryService {
     public CategoryService(CategoryRepository repository) { this.repository = repository; }
 
     public List<Category> findRoots() { return repository.findByParentIsNullOrderByNameAscIdAsc(); }
+    public List<Category> findChildren(Long parentId) { return repository.findByParentIdOrderByNameAscIdAsc(parentId); }
     public List<Category> findAll() { return repository.findAllByOrderByNameAscIdAsc(); }
     public List<Category> findActive() { return repository.findByActiveTrueOrderByNameAscIdAsc(); }
     public Category get(Long id) {

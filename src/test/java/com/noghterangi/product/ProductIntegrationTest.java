@@ -250,6 +250,27 @@ class ProductIntegrationTest {
     }
 
     @Test
+    void adminProductListFiltersProductsByCategory() throws Exception {
+        CategoryForm otherCategoryForm = new CategoryForm();
+        otherCategoryForm.setName("دسته دیگر محصول");
+        otherCategoryForm.setSlug(prefix + "-other-category");
+        Category otherCategory = categoryService.create(otherCategoryForm);
+
+        Product selected = service.create(form("selected"));
+        ProductForm otherProductForm = form("other");
+        otherProductForm.setCategoryId(otherCategory.getId());
+        Product other = service.create(otherProductForm);
+
+        browser.login();
+        assertThat(browser.get("/admin/products?categoryId=" + category.getId()).body())
+                .contains("data-product-id=\"" + selected.getId() + "\"")
+                .doesNotContain("data-product-id=\"" + other.getId() + "\"");
+        assertThat(browser.get("/admin/products?categoryId=" + otherCategory.getId()).body())
+                .contains("data-product-id=\"" + other.getId() + "\"")
+                .doesNotContain("data-product-id=\"" + selected.getId() + "\"");
+    }
+
+    @Test
     void adminShowsDuplicateAndNumericBindingErrorsWithoutSaving() throws Exception {
         browser.login();
         Product existing = service.create(form("existing"));

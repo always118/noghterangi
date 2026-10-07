@@ -71,6 +71,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .section-title { font-size: clamp(1.35rem, 3vw, 1.8rem); }
 .category-card { overflow-wrap: anywhere; height: 100%; padding: var(--nr-space); border-radius: var(--nr-radius); }
 .category-card p { font-size: .875rem; }
+.admin-category-filter { background: var(--nr-surface); box-shadow: var(--nr-shadow); }
+.admin-category-filter .form-label { font-weight: 600; }
 .category-symbol { display: block; font-size: 2rem; margin-bottom: .5rem; }
 .tone-mint { background: #e2eee5; }
 .tone-peach { background: #f9e8df; }

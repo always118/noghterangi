@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -16,10 +17,12 @@ public class AdminProductController {
     public AdminProductController(ProductService service, MediaService media) { this.service = service; this.media = media; }
 
     @GetMapping
-    public String list(Model model) {
-        var products = service.findAll();
+    public String list(@RequestParam(required = false) Long categoryId, Model model) {
+        var products = service.findAll(categoryId);
         model.addAttribute("products", products);
         model.addAttribute("primaryImages", media.primaryImages(products.stream().map(Product::getId).toList()));
+        model.addAttribute("categoryOptions", service.categoryFilterChoices());
+        model.addAttribute("selectedCategoryId", categoryId);
         return "admin/products/list";
     }
 
@@ -74,6 +77,7 @@ public class AdminProductController {
     private String form(Model model, Long id) {
         model.addAttribute("productId", id);
         model.addAttribute("categories", service.categoryChoices(id));
+        model.addAttribute("categoryParents", service.categoryFilterChoices());
         model.addAttribute("productTypes", ProductType.values());
         return "admin/products/form";
     }

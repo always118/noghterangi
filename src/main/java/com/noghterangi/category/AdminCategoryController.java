@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/admin/categories")
 public class AdminCategoryController {
@@ -24,8 +26,19 @@ public class AdminCategoryController {
     public java.util.List<Category> parentCategories() { return service.findRoots(); }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("categories", service.findAll());
+    public String list(@RequestParam(required = false) Long parentId, Model model) {
+        List<Category> roots = service.findRoots();
+        Long requestedParentId = parentId;
+        Category selectedParent = roots.stream()
+                .filter(category -> category.getId().equals(requestedParentId))
+                .findFirst()
+                .orElse(null);
+        if (parentId != null && selectedParent == null) {
+            parentId = null;
+        }
+        model.addAttribute("categories", selectedParent == null ? roots : service.findChildren(parentId));
+        model.addAttribute("selectedParentId", parentId);
+        model.addAttribute("selectedParent", selectedParent);
         return "admin/categories/list";
     }
 

@@ -129,6 +129,25 @@ class CategoryIntegrationTest {
     }
 
     @Test
+    void adminCategoryListShowsRootsFirstAndFiltersChildrenByParent() throws Exception {
+        browser.login();
+        Category root = service.create(form("دسته اصلی فیلتر", prefix + "-root", true));
+        CategoryForm childForm = form("زیرمجموعه فیلتر", prefix + "-child", true);
+        childForm.setParentId(root.getId());
+        service.create(childForm);
+        Category otherRoot = service.create(form("دسته اصلی دیگر", prefix + "-other", true));
+
+        String rootsPage = get("/admin/categories").body();
+        assertThat(rootsPage).contains(prefix + "-root", prefix + "-other")
+                .doesNotContain(prefix + "-child");
+
+        String childrenPage = get("/admin/categories?parentId=" + root.getId()).body();
+        assertThat(childrenPage).contains(prefix + "-child", "زیرمجموعه‌های", "دسته اصلی فیلتر")
+                .doesNotContain(prefix + "-other");
+        assertThat(otherRoot.getId()).isNotEqualTo(root.getId());
+    }
+
+    @Test
     void adminShowsClearValidationErrorsAndPreservesInputs() throws Exception {
         browser.login();
         HttpResponse<String> invalid = post("/admin/categories", Map.of("name", "   ", "slug", prefix + "--bad"));
