@@ -1,29 +1,31 @@
-# Reviewed development catalog
+# Channel import data
 
-This directory is **not packaged as a static resource or migration**. Nothing imports by default.
-Use a local development database, Java 21, existing DB/admin environment configuration, and:
+این پوشه برای داده‌های بازبینی‌شده‌ی import کانال و کاتالوگ دسته‌هاست. هیچ داده‌ای
+به‌صورت خودکار وارد برنامه یا Production نمی‌شود.
+
+## Canonical categories
+
+`category-catalog.json` مرجع قراردادی ۸ دسته‌ی اصلی و ۴۹ زیردسته است. importer دسته‌ای
+از JSON نمی‌سازد یا تغییر نمی‌دهد؛ `categorySlug` هر محصول باید در جدول `category` دیتابیس
+هدف وجود داشته باشد و همان رکورد دیتابیس مرجع نام، والد و active بودن است.
+
+## Channel product import
+
+`channel-products.json` manifest بازبینی‌شده‌ی استخراج از `noghterangi-export/posts.json` است.
+این فایل ۹۰ محصول کاندید و مسیر تصاویر نسبی دارد. رکوردهای دارای `priceReviewRequired` باید
+قبل از فروش بررسی شوند و رکوردهای بدون قیمت وارد نمی‌شوند.
+
+سرویس با endpoint محافظت‌شده‌ی admin اجرا می‌شود:
 
 ```sh
-mvn spring-boot:run -Dspring-boot.run.profiles=dev -Dspring-boot.run.arguments="--app.dev-data.enabled=true --app.dev-data.directory=dev-data"
+curl -b admin.cookies -H 'X-CSRF-TOKEN: TOKEN' \
+  -F 'manifest=@dev-data/channel-products.json;type=application/json' \
+  http://localhost:8080/admin/import/products
 ```
 
-For the packaged application:
+تصاویر از `PRODUCT_IMPORT_MEDIA_ROOT` (پیش‌فرض `noghterangi-export`) خوانده می‌شوند؛
+بنابراین export و پوشه‌ی `media/` باید روی همان host برنامه وجود داشته باشند.
 
-```sh
-java -jar target/noghte-rangi-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev --app.dev-data.enabled=true
-```
-
-The importer requires `dev` or `test` **and** explicit `app.dev-data.enabled=true`.
-It is excluded when either `prod` or `production` is active, even alongside `dev`/`test`.
-Use the development database only; a Spring profile cannot determine whether a supplied database URL is production.
-`products.json` is the small reviewed manifest, not a general chat-file importer.
-`images.json` preserves the original photo index for provenance; only paths accepted in `products.json` are imported.
-Each product and its media are one transaction through ProductService and MediaService. A missing/rejected referenced
-image skips that product; a deliberately empty image list uses the normal placeholder. Bad records do not stop later ones.
-Existing slug, SKU or exact case-insensitive product name is skipped; existing records and images are never overwritten.
-Duplicate keys inside a manifest reject all affected rows. An existing category with a conflicting name is not reused.
-`import-report.md` records the latest run, including imported, skipped, duplicate, missing and rejected counts.
-Read `data-review.md` for the source review, authorized sample prices and unresolved records.
-
-Before real sales: confirm prices, inventory and product facts in admin; replace `DEV-P13-*` identifiers with business SKUs.
-Re-running import never applies price edits to existing data; use the existing admin editor for deliberate changes.
+حالت عادی additive و idempotent است و محصولات قبلی را overwrite نمی‌کند. حذف همه‌ی محصولات
+فقط با `deleteExisting=true` و بعد از backup مجاز است. import کانال در Production به‌صورت
+پیش‌فرض غیرفعال است.

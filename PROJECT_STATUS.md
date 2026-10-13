@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 18 — Homepage Category UX
+Phase 20 — Environment & Canonical Catalog
 
 Status: IN_PROGRESS
 
@@ -23,6 +23,10 @@ Status: IN_PROGRESS
 - Phase 12 — Admin Orders
 - Phase 13 — Real Homepage
 - Phase 14 — UX Polish
+- Phase 15 — Docker
+- Phase 16 — Full V1 Testing
+- Phase 17 — V1 Release Preparation
+- Phase 18 — Homepage Category UX
 
 Note:
 Phase 5 Categories was implemented before Phase 4 because the project
@@ -31,25 +35,15 @@ Admin Security now protects the existing category routes and future admin routes
 
 ## Current Work
 
-Phase 14 completed: public mobile navigation, search feedback, product/card hierarchy,
-RTL, accessible controls and checkout/confirmation presentation refined. Business data is unchanged.
+Phase 14 completed: public mobile navigation, search feedback, product/card hierarchy, RTL,
+accessible controls and checkout/confirmation presentation refined.
 
-Phase 15 completed: PostgreSQL and Spring Boot run through Compose with a Java 21 multi-stage
-image, external environment configuration, health-gated startup, Flyway validation, and
-persistent database/media volumes.
-
-Phase 16 completed: full automated V1 regression coverage and Docker runtime verification passed;
-no source or business-behavior fixes were required.
-
-Phase 17 completed: shared local Cropper.js image editor and category media support passed the full
-Java 21 test suite and Docker health verification.
-
-Phase 18 completed: final 8-root/49-child category catalog was entered through the existing admin services;
-15 products were reassigned without deletion and all eight prepared category images were uploaded through MediaService.
+Phases 15–18 completed: Docker deployment, full V1 regression preparation, media editor/category media,
+and the final 8-root/49-child category catalog were implemented and verified as recorded below.
 
 ## Next Phase
 
-Phase 18 — Content Module / V1.1 (NOT_STARTED; explicit approval required)
+Phase 20 — Environment & Canonical Catalog (IN_PROGRESS)
 
 ## Existing Foundation
 
@@ -70,7 +64,8 @@ Phase 18 — Content Module / V1.1 (NOT_STARTED; explicit approval required)
 - Media metadata and replaceable local storage; JPEG/PNG product images
 - database-driven homepage: active root categories, newest/featured/board-game sections (eight products each), batched primary images
 - supplied logo and four reviewed category photos; shared catalog cards and GET search
-- opt-in dev/test importer with production-profile exclusion, per-product/media transactions, idempotence, and reports
+- protected channel product importer with production-profile exclusion, database-owned category resolution,
+  per-product/media transactions and idempotence
 - Public product catalog with PostgreSQL search/filter/sort and Spring Data pagination
 - Public product detail by slug with gallery, breadcrumbs, and friendly 404
 - Anonymous HTTP-session cart with product-detail add, quantity controls, subtotal, and navigation badge
@@ -130,13 +125,8 @@ Phase 18 — Content Module / V1.1 (NOT_STARTED; explicit approval required)
 - Order totals use whole Toman and exclude shipping charges. No gateway, receipt upload, or customer accounts.
 - Temporary runtime credentials/data removed and verification server stopped.
 
-- Supplied development catalog: 15 products, 17 stored product images, four categories and four group photos.
-- All prices are user-authorized development samples, not confirmed retail prices; unknown stock remains zero.
-- Three featured flags are documented demo selections. Required generated DEV-P13 SKUs must later be replaced.
-- Three Sport Life variants have no individual photo and use the normal placeholder; their shared group photo is used only for the category.
-- Twenty broader/conflicting chat records are isolated in dev-data/data-review.md. No board-game products were supplied.
-- Import requires dev/test plus app.dev-data.enabled=true; prod/production exclude it. Use only a development DB URL.
-- No Flyway migration, dependency, security-rule or production seed changes in Phase 13.
+- Channel export contains 90 product candidates and 199 downloaded media files; prices and stock remain subject
+  to review before sales. Category slugs resolve against the target database and are never created from JSON.
 
 ## Last Verification
 
@@ -156,7 +146,7 @@ Phase 18 — Content Module / V1.1 (NOT_STARTED; explicit approval required)
 - Admin login/logout, category/product activation/editing, media upload/order/removal, order paging/filter/status,
   full fulfillment flow, cancellation/retry and database stock restoration assertions passed.
 - Cart, checkout, confirmation, detail and admin order pages also fit 360/768/1440px. Representative screenshots
-  visually reviewed; final captures and report are in dev-data/verification/phase14/.
+  visually reviewed during the completed UX phase; old screenshot artifacts are not runtime inputs.
 - Availability-label contrast measured at 8.29:1 (available) and 4.92:1 (unavailable) against their background.
   This is a targeted accessibility review, not a claim of a formal whole-site conformance audit.
 - Performance: removed unused demo styles/redundant navigation, kept existing lazy images/batched queries;
@@ -190,6 +180,35 @@ Phase 18 — Content Module / V1.1 (NOT_STARTED; explicit approval required)
   categories, 15 products with no orphaned category relations, eight assigned images, and zero absolute media paths.
   Java 21 `mvn clean verify` passed with 98 tests. No automatic commit.
 
+- Phase 19 implemented: Telegram channel export review identified 90 product-caption posts and 199 downloaded
+  media files. A generated, reviewable product manifest and protected import endpoint were implemented;
+  existing products remain untouched unless the explicit delete-existing option is supplied.
+
+- Phase 19 verification: Java 21 compile, Docker image build and in-container `/health` passed. Full Maven
+  verification was attempted but the test database rejected the configured `noghterangi_test` password;
+  no import was executed against the database.
+
+- Phase 20 in progress: development manifests were moved from temporary four-category data to the canonical
+  eight-root category catalog. Environment boundaries, project structure and execution rules are documented;
+  no production database or media write has been performed.
+
+- Phase 20 verification so far: the channel manifest is generated from the canonical catalog with 8 roots and
+  49 children, and Java 21 compilation passes. Production
+  synchronization remains pending explicit production access, backup and approval.
+
+- Category import correction: both development and channel product importers resolve category slugs from the
+  target database and never create or rename categories from uploaded JSON. Test sources compile successfully;
+  runtime suite still requires matching `TEST_DB_PASSWORD` and the isolated test database.
+
+- Phase 20 documentation cleanup: obsolete development-product importer, its two tests, old fixtures, reports,
+  screenshots and provenance files were removed. The remaining development inputs are the canonical category
+  catalog and reviewed channel manifest. Java 21 test compilation passed after the cleanup.
+
+- Phase 20 catalog administration: added a dev/test-only protected API to import the canonical category catalog
+  and separate explicit-confirmation APIs to remove products or categories and their media without deleting order history.
+  Added the server-rendered `/admin/catalog` page for category import, channel product import and separate resets.
+  Java 21 test compilation passed; no destructive catalog operation was executed.
+
 ## Last Updated
 
-2026-10-07
+2026-10-13

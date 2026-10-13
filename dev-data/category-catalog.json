@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "roots": [
+    {"name": "نوشت‌افزار", "slug": "stationery", "children": [
+      {"name": "مداد و مدادقرمز", "slug": "pencils"},
+      {"name": "مدادرنگی", "slug": "colored-pencils"},
+      {"name": "اتود و نوک اتود", "slug": "mechanical-pencils-leads"},
+      {"name": "خودکار و روان‌نویس", "slug": "pens-rollerballs"},
+      {"name": "پاک‌کن", "slug": "erasers"},
+      {"name": "تراش", "slug": "sharpeners"},
+      {"name": "غلط‌گیر", "slug": "correction"},
+      {"name": "چسب", "slug": "glue"},
+      {"name": "قیچی و منگنه", "slug": "scissors-staplers"},
+      {"name": "خط‌کش و پرگار", "slug": "rulers-compasses"}
+    ]},
+    {"name": "دفتر و کاغذ", "slug": "notebooks-paper", "children": [
+      {"name": "دفتر مشق", "slug": "exercise-books"},
+      {"name": "دفتر نقاشی", "slug": "drawing-books"},
+      {"name": "دفترچه یادداشت", "slug": "notepads"},
+      {"name": "دفترهای فانتزی", "slug": "fancy-notebooks"},
+      {"name": "جلد و لوازم دفتر و کتاب", "slug": "book-notebook-accessories"}
+    ]},
+    {"name": "هنر و خلاقیت", "slug": "art-creativity", "children": [
+      {"name": "پاستل", "slug": "oil-pastels"},
+      {"name": "آبرنگ", "slug": "watercolor"},
+      {"name": "گواش", "slug": "gouache"},
+      {"name": "رنگ انگشتی", "slug": "finger-paint"},
+      {"name": "ماژیک رنگ‌آمیزی", "slug": "coloring-markers"},
+      {"name": "خمیربازی", "slug": "modeling-clay"}
+    ]},
+    {"name": "کیف و جامدادی", "slug": "bags-pencil-cases", "children": [
+      {"name": "جامدادی تک‌زیپ", "slug": "single-zip-pencil-cases"},
+      {"name": "جامدادی دوتایی", "slug": "double-pencil-cases"},
+      {"name": "جامدادی پارچه‌ای", "slug": "fabric-pencil-cases"},
+      {"name": "جامدادی توری", "slug": "mesh-pencil-cases"},
+      {"name": "جامدادی فانتزی", "slug": "fancy-pencil-cases"},
+      {"name": "کوله‌پشتی", "slug": "backpacks"}
+    ]},
+    {"name": "بطری و قمقمه", "slug": "bottles-flasks", "children": [
+      {"name": "قمقمه کودک", "slug": "kids-bottles"},
+      {"name": "قمقمه اسپرت", "slug": "sport-bottles"},
+      {"name": "قمقمه نی‌دار", "slug": "straw-bottles"},
+      {"name": "قمقمه بنددار", "slug": "strap-bottles"},
+      {"name": "قمقمه مدرسه و مهد", "slug": "school-kindergarten-bottles"}
+    ]},
+    {"name": "بازی و اسباب‌بازی", "slug": "games-toys", "children": [
+      {"name": "بازی فکری", "slug": "board-games"},
+      {"name": "بازی آموزشی", "slug": "educational-games"},
+      {"name": "بازی ساختنی", "slug": "construction-toys"},
+      {"name": "بازی دست‌ورزی", "slug": "dexterity-games"},
+      {"name": "بازی نقش‌آفرینی", "slug": "role-play-games"},
+      {"name": "ست‌های مشاغل", "slug": "profession-sets"}
+    ]},
+    {"name": "کتاب کودک", "slug": "childrens-books", "children": [
+      {"name": "کتاب رنگ‌آمیزی", "slug": "coloring-books"},
+      {"name": "کتاب کار", "slug": "workbooks"},
+      {"name": "کتاب آموزشی", "slug": "educational-books"},
+      {"name": "داستان", "slug": "story-books"},
+      {"name": "پک کتاب", "slug": "book-packs"}
+    ]},
+    {"name": "کمک‌آموزشی", "slug": "educational-supplies", "children": [
+      {"name": "پک ریاضی", "slug": "math-packs"},
+      {"name": "پک کلاس اول", "slug": "first-grade-packs"},
+      {"name": "پک کلاس دوم", "slug": "second-grade-packs"},
+      {"name": "کارت آموزشی", "slug": "educational-cards"},
+      {"name": "ابزار آموزش ریاضی", "slug": "math-tools"},
+      {"name": "آموزش الفبا", "slug": "alphabet-learning"}
+    ]}
+  ]
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('مدیریت کاتالوگ', ~{::content})}">
+<head><title>مدیریت کاتالوگ</title></head>
+<body><section th:fragment="content" aria-labelledby="catalog-title">
+    <nav th:replace="~{admin/navigation :: navigation}"></nav>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <p class="eyebrow mb-1">ابزارهای توسعه</p>
+            <h1 id="catalog-title" class="h3 mb-2">مدیریت کاتالوگ</h1>
+            <p class="text-muted mb-0">پاک‌سازی، افزودن دسته‌ها و ورود محصولات کانال از یک صفحه.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary" th:href="@{/admin/categories}">مدیریت دسته‌ها</a>
+            <a class="btn btn-outline-secondary" th:href="@{/admin/products}">مدیریت محصولات</a>
+        </div>
+    </div>
+
+    <div class="alert alert-warning" role="note">
+        این صفحه فقط برای محیط توسعه یا تست است. قبل از حذف، از دیتابیس و فایل‌های تصاویر backup بگیرید.
+        سفارش‌ها حذف نمی‌شوند، اما محصولات و تصاویر کاتالوگ حذف خواهند شد.
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-6">
+            <article class="bg-white border rounded-3 p-4 h-100">
+                <h2 class="h5">افزودن دسته‌های canonical</h2>
+                <p class="text-muted">فایل هشت دستهٔ اصلی و ۴۹ زیردسته را وارد می‌کند. دسته‌های موجود دوباره ساخته نمی‌شوند.</p>
+                <form method="post" enctype="multipart/form-data" th:action="@{/admin/catalog/categories/import-ui}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label class="form-label" for="categoryCatalog">فایل category-catalog.json</label>
+                    <input class="form-control mb-3" id="categoryCatalog" name="catalog" type="file"
+                           accept="application/json,.json" required>
+                    <button class="btn btn-primary" type="submit">افزودن دسته‌ها</button>
+                </form>
+            </article>
+        </div>
+
+        <div class="col-12 col-lg-6" th:if="${channelImportEnabled}">
+            <article class="bg-white border rounded-3 p-4 h-100">
+                <h2 class="h5">ورود محصولات کانال</h2>
+                <p class="text-muted">manifest بازبینی‌شدهٔ محصولات کانال را وارد می‌کند و تصاویر را از مسیر تنظیم‌شده می‌خواند.</p>
+                <form method="post" enctype="multipart/form-data" th:action="@{/admin/catalog/products/import-ui}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label class="form-label" for="channelManifest">فایل channel-products.json</label>
+                    <input class="form-control mb-3" id="channelManifest" name="manifest" type="file"
+                           accept="application/json,.json" required>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" id="allowPriceReview" name="allowPriceReviewRequired" type="checkbox" value="true">
+                        <label class="form-check-label" for="allowPriceReview">ورود محصولات نیازمند بررسی قیمت</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" id="deleteProducts" name="deleteExisting" type="checkbox" value="true">
+                        <label class="form-check-label text-danger" for="deleteProducts">حذف محصولات فعلی قبل از ورود</label>
+                    </div>
+                    <button class="btn btn-primary" type="submit">شروع ورود محصولات</button>
+                </form>
+            </article>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <article class="bg-white border border-danger rounded-3 p-4 h-100">
+                <h2 class="h5 text-danger">حذف محصولات</h2>
+                <p class="text-muted">همه محصولات و تصاویر محصول را حذف می‌کند. دسته‌ها و سفارش‌ها باقی می‌مانند.</p>
+                <form method="post" th:action="@{/admin/catalog/products/clear-ui}"
+                      onsubmit="return confirm('آیا از حذف کامل کاتالوگ مطمئن هستید؟');">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label class="form-label" for="deleteProductsConfirmation">برای تأیید، عبارت زیر را وارد کنید: <bdi dir="ltr">DELETE_ALL_CATALOG</bdi></label>
+                    <input class="form-control mb-3" id="deleteProductsConfirmation" name="confirmation" type="text"
+                           dir="ltr" autocomplete="off" required>
+                    <button class="btn btn-danger" type="submit">حذف محصولات</button>
+                </form>
+            </article>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <article class="bg-white border border-danger rounded-3 p-4 h-100">
+                <h2 class="h5 text-danger">حذف دسته‌ها</h2>
+                <p class="text-muted">همه دسته‌ها و تصاویر دسته را حذف می‌کند. برای جلوگیری از خطای ارتباطی، ابتدا محصولات را حذف کنید.</p>
+                <form method="post" th:action="@{/admin/catalog/categories/clear-ui}"
+                      onsubmit="return confirm('آیا از حذف همه دسته‌ها مطمئن هستید؟');">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label class="form-label" for="deleteCategoriesConfirmation">برای تأیید، عبارت زیر را وارد کنید: <bdi dir="ltr">DELETE_ALL_CATALOG</bdi></label>
+                    <input class="form-control mb-3" id="deleteCategoriesConfirmation" name="confirmation" type="text"
+                           dir="ltr" autocomplete="off" required>
+                    <button class="btn btn-danger" type="submit">حذف دسته‌ها</button>
+                </form>
+            </article>
+        </div>
+    </div>
+</section></body>
+</html>

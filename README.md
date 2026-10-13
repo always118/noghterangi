@@ -1,7 +1,11 @@
 # Noghte Rangi — نقطه رنگی
 
+برای مرزبندی dev/test/production، ترتیب اجرای importها و کاتالوگ canonical، ابتدا
+[راهنمای محیط‌ها و همگام‌سازی](ENVIRONMENT_GUIDE.md) را بخوانید.
+برای پاک‌سازی کاتالوگ توسعه و ورود دسته‌های canonical، [راهنمای مدیریت کاتالوگ](CATALOG_MANAGEMENT_GUIDE.md) را بخوانید.
+
 A Persian local online shop built incrementally as a simple Spring Boot modular
-monolith. Current implementation: **Phase 14 — UX Polish**, with database-driven product discovery, cart, guest checkout, and protected catalog/order administration.
+monolith. Current implementation: **Phase 20 — Environment & Canonical Catalog**, with database-driven product discovery, cart, guest checkout, protected catalog/order administration, and reviewed channel import.
 
 ## Prerequisites
 
@@ -564,13 +568,11 @@ message identifies the product ID for manual investigation; historical snapshots
 There is no partial cancellation, automatic refund, or override for missing products.
 Customer confirmation shows payment instructions only while waiting for payment.
 
-## Reviewed development products (Phase 13)
+## Channel product import
 
-See [dev-data/README.md](dev-data/README.md) for the explicit opt-in importer and
-[data review](dev-data/data-review.md) for source decisions. Fifteen supplied products
-use user-authorized **sample prices**, zero unknown stock, and three documented demo
-featured flags. No business price or inventory is implied. Import is disabled by
-default and excluded from production profiles. It never updates existing records.
+See [dev-data/README.md](dev-data/README.md) for the reviewed channel manifest,
+database-owned category resolution and protected admin import endpoint. The import is
+disabled in Production by default and never creates categories from the uploaded JSON.
 
 The homepage queries at most eight products per section (newest, featured, board games),
 fetches categories with each product, and batches primary-image lookup across sections.
@@ -585,4 +587,4 @@ and a no-JavaScript fallback. Catalog category choices include the parent name, 
 share consistent prices/statuses, and checkout keeps its total visible above expandable item
 details on mobile. Server validation identifies invalid fields and focuses its error summary.
 Order and payment identifiers use directional isolation for Persian RTL. Business rules and
-imported catalog data are unchanged. See [verification and screenshots](dev-data/verification/phase14/README.md).
+imported catalog data are unchanged. Historical verification artifacts are not required at runtime.

@@ -19,6 +19,10 @@
 - Do not start the next phase without explicit approval.
 - Keep explanations concise.
 - Before each phase read PROJECT_STATUS.md and PHASE_STATUS.md.
+- Before environment-sensitive work also read ENVIRONMENT_GUIDE.md; always name the target environment (dev, test, or production) in the work update.
+- Before repository navigation read PROJECT_STRUCTURE.md; use DEVELOPMENT_RUNBOOK.md for application/test commands and update both guides when their contracts change.
 - At the start of each phase update its status to IN_PROGRESS.
 - Mark a phase DONE only after build/tests/verification succeed.
 - Do not commit Git changes automatically unless explicitly requested.
+- Never assume development and production databases/media are synchronized. Do not connect to or write production without explicit production access and approval.
+- Treat dev-data and channel exports as development inputs only; use the canonical category catalog and never recreate temporary `dev-*` categories.
