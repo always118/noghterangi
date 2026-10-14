@@ -8,3 +8,10 @@
 !.env.example
 
 /uploads/
+
+/screenshots/
+
+*.tar.gz
+*.zip
+
+
