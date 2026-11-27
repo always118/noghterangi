@@ -56,6 +56,11 @@ The normal app image does not import data automatically. Stop it with `Ctrl+C` o
 
 ## Isolated test environment
 
+After changing the Dockerfile, build the image with `docker build -t noghterangi-app:test .`
+and verify its `/health` endpoint against an isolated PostgreSQL instance.
+The Dockerfile extracts the Spring Boot layers so Docker can reuse unchanged
+dependency layers when pulling a new release.
+
 The test database is separate from development:
 
 - database: `noghterangi_test`

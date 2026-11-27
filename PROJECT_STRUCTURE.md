@@ -43,7 +43,7 @@ dev-data/                         Canonical category catalog and reviewed channe
 noghterangi-export/               Raw channel export and source media; development input only
 scripts/                          Small data-preparation utilities, not application runtime code
 docker-compose.yml                Local development PostgreSQL/app and isolated test PostgreSQL
-Dockerfile                        Java 21 multi-stage production image
+Dockerfile                        Java 21 image with separate Spring Boot dependency and application layers
 compose.production.yml            Production app and existing external media/network
 .github/workflows/ci-cd.yml        PostgreSQL tests, GHCR release and opt-in deployment
 PROJECT_STATUS.md                 Phase history, current work and verification facts
