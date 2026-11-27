@@ -1,0 +1,38 @@
+name: Verify production SSH
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ssh-check:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    environment: production
+    steps:
+      - name: Verify host, credentials and forced command
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          umask 077
+          key_dir=$(mktemp -d "$RUNNER_TEMP/ssh-check.XXXXXXXX")
+          trap 'rm -f "$key_dir/key" "$key_dir/known_hosts"; rmdir "$key_dir"' EXIT
+          printf '%s\n' "$DEPLOY_KEY" > "$key_dir/key"
+          printf '%s\n' "$KNOWN_HOSTS" > "$key_dir/known_hosts"
+          status=0
+          ssh -nT -i "$key_dir/key" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o "UserKnownHostsFile=$key_dir/known_hosts" -o ConnectTimeout=15 \
+            -p "$DEPLOY_PORT" -l "$DEPLOY_USER" -- "$DEPLOY_HOST" true || status=$?
+          case "$status" in
+            1) echo 'SSH authenticated and the forced command rejected the probe.' ;;
+            0) echo 'The key unexpectedly permits a regular SSH command.' >&2; exit 1 ;;
+            *) echo "SSH probe failed with status $status." >&2; exit 1 ;;
+          esac
