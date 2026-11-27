@@ -1,4 +1,4 @@
-# Build with the project JDK, then run with a JRE-only image.
+# Build and extract the Spring Boot application layers.
 FROM maven:3.9.11-eclipse-temurin-21 AS build
 WORKDIR /workspace
 
@@ -8,16 +8,20 @@ RUN --mount=type=cache,target=/root/.m2 mvn -B -ntp dependency:go-offline
 COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -B -ntp -DskipTests package
 
+RUN mv target/noghte-rangi-*.jar app.jar \
+    && java -Djarmode=tools -jar app.jar extract --layers --destination extracted \
+    && find extracted -exec touch -h -d @0 {} +
+
 FROM eclipse-temurin:21-jre-jammy
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && useradd --system --uid 10001 --create-home --home-dir /app appuser \
+RUN useradd --system --uid 10001 --create-home --home-dir /app appuser \
     && mkdir -p /app/data/media \
     && chown -R appuser:appuser /app
 WORKDIR /app
 
-COPY --from=build --chown=appuser:appuser /workspace/target/noghte-rangi-*.jar /app/app.jar
+COPY --link --from=build /workspace/extracted/dependencies/ ./
+COPY --link --from=build /workspace/extracted/spring-boot-loader/ ./
+COPY --link --from=build /workspace/extracted/snapshot-dependencies/ ./
+COPY --link --from=build /workspace/extracted/application/ ./
 
 USER appuser
 ENV MEDIA_STORAGE_PATH=/app/data/media
