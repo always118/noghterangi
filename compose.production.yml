@@ -1,7 +1,7 @@
 services:
   app:
     image: ${PRODUCTION_IMAGE:?Set PRODUCTION_IMAGE to the release digest}
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env.production
     environment:
