@@ -84,6 +84,7 @@ jobs:
           IMAGE: ${{ needs.publish.outputs.image }}
           GH_TOKEN: ${{ github.token }}
           DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
           DEPLOY_USER: ${{ vars.DEPLOY_USER }}
           DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
@@ -99,4 +100,4 @@ jobs:
           printf '%s\n' "$IMAGE" | ssh -T -i "$RUNNER_TEMP/deploy.key" \
             -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
             -o "UserKnownHostsFile=$RUNNER_TEMP/deploy.known_hosts" -o ConnectTimeout=15 \
-            -l "$DEPLOY_USER" -- "$DEPLOY_HOST" deploy
+            -p "$DEPLOY_PORT" -l "$DEPLOY_USER" -- "$DEPLOY_HOST" deploy
