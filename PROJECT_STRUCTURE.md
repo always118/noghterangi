@@ -44,6 +44,8 @@ noghterangi-export/               Raw channel export and source media; developme
 scripts/                          Small data-preparation utilities, not application runtime code
 docker-compose.yml                Local development PostgreSQL/app and isolated test PostgreSQL
 Dockerfile                        Java 21 multi-stage production image
+compose.production.yml            Production app and existing external media/network
+.github/workflows/ci-cd.yml        PostgreSQL tests, GHCR release and opt-in deployment
 PROJECT_STATUS.md                 Phase history, current work and verification facts
 PHASE_STATUS.md                   One-row status/verification per phase
 ENVIRONMENT_GUIDE.md              Dev/test/production boundaries and synchronization rules
