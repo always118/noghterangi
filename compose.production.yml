@@ -1,0 +1,28 @@
+services:
+  app:
+    image: ${PRODUCTION_IMAGE:?Set PRODUCTION_IMAGE to the release digest}
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      SPRING_PROFILES_ACTIVE: production
+      MEDIA_STORAGE_PATH: /app/data/media
+      CHANNEL_IMPORT_ENABLED: 'false'
+      CATALOG_MANAGEMENT_ENABLED: 'false'
+      SESSION_COOKIE_SECURE: 'true'
+    ports:
+      - '127.0.0.1:${PRODUCTION_APP_PORT:-8080}:8080'
+    volumes:
+      - media:/app/data/media
+    networks:
+      - database
+
+volumes:
+  media:
+    external: true
+    name: ${PRODUCTION_MEDIA_VOLUME:?Set the existing production media volume}
+
+networks:
+  database:
+    external: true
+    name: ${PRODUCTION_DB_NETWORK:?Set the production database network}
