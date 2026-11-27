@@ -84,6 +84,24 @@ mvn -Dtest=ProductIntegrationTest test
 
 A database connection, Flyway migration or authentication failure is a real test failure; do not silently skip it. Test fixtures must create their own records and must not depend on development data.
 
+## CI/CD and production
+
+Connect the GitHub repository to a published Codex Cloud environment from web or desktop, then select that environment for tasks on mobile. Ask Codex to open a PR and report test results. On GitHub, require PRs and the `verify` status check on the default branch. Restrict direct pushes and review changes to workflows and deployment files. The workflow verifies PRs and pushes against an isolated PostgreSQL 16 service, then publishes a commit-tagged image to GHCR after a successful default-branch push.
+
+Before enabling deployment:
+
+1. Back up production PostgreSQL and media together. Identify the existing Compose project name, media volume, DB network, and DB host from production. Check server architecture against the published Linux amd64 image. Keep the current application image and release digest for recovery.
+2. Install `compose.production.yml` and `scripts/deploy-production.sh` into a trusted server-side deployment directory. Keep them and the directory protected from modification by unrelated users. Configure the directory's private `.env` with `COMPOSE_PROJECT_NAME` (the existing project's name for an in-place switch), `PRODUCTION_MEDIA_VOLUME`, `PRODUCTION_DB_NETWORK`, and optional `PRODUCTION_APP_PORT`. Put production JDBC and application secrets in `.env.production`, with restrictive permissions. Database access must work independently of this app-only Compose file. Verify the existing app is managed as service `app`, and the reverse proxy targets the configured loopback port. For private GHCR images, log in on the server as the deployment user with a package read credential.
+3. Give a dedicated deploy key a forced command in the deployment user's `authorized_keys`. Example entry (replace all paths, repository and key):
+
+   ```text
+   restrict,command="/bin/bash /srv/noghterangi/scripts/deploy-production.sh /srv/noghterangi ghcr.io/owner/repo" ssh-ed25519 PUBLIC_KEY
+   ```
+
+   The account must be able to use Docker. Docker access is effectively root on the host, so treat this as a privileged deployment identity. Keep the private key in GitHub Actions secrets, never in Codex or Git.
+4. Configure GitHub environment `production`, restricting it to the default branch where supported. Set variables `DEPLOY_HOST` (SSH hostname or IP on port 22), `DEPLOY_USER`, and secrets `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS` (host key verified via the server console). Set repository variable `PRODUCTION_DEPLOY_ENABLED=true` only when ready for the first approved cutover. Redeployments run after a default-branch push that passes verification and publishing.
+5. At cutover, verify the GitHub deployment, public HTTPS `/health`, homepage and a known existing image. The host waits for app container health and reports failure to GitHub. For recovery, use the previous digest with `PRODUCTION_IMAGE` and the same app-only Compose file after checking Flyway/schema compatibility. If the schema changed incompatibly, follow the production backup recovery plan. Retain the failed release logs and the matching DB/media backups.
+
 ## Channel product import
 
 Input and source files:

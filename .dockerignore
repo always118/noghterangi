@@ -9,4 +9,8 @@ uploads/
 .env.*
 !.env.example
 *.zip
+*.dump
+*.tar.gz
+*.sha256
+.production-deploy.lock
 *.class

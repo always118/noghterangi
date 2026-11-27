@@ -15,3 +15,7 @@
 *.zip
 
 
+*.dump
+*.tar.gz
+*.sha256
+.production-deploy.lock
